@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/match2"
+    android:orientation="vertical"
+    tools:context=".MainFragment">
+
+    <LinearLayout
+        android:id="@+id/area_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar_main"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:weightSum="5">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:fontFamily="@font/maple"
+            android:text="평균단가 : "
+            android:textColor="@color/match1"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/totalavg"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:fontFamily="@font/maple"
+            android:gravity="right"
+            android:text="0"
+            android:textColor="@color/match1"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/maple"
+            android:text="원"
+            android:textColor="@color/match1"
+            android:textSize="30dp" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/infotext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/area_top"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="3dp"
+        android:fontFamily="@font/maple"
+        android:text="각 항목별 짧게 눌러 초기화/길게눌러 삭제 가능합니다. "
+        android:textColor="@color/match1" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/coinrecycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom"
+        android:layout_below="@id/infotext"
+        android:paddingLeft="10dp"
+        android:paddingTop="5dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="5dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/itemlist">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <Button
+            android:id="@+id/addbtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/btn_layout"
+            android:text="추가"
+            android:textColor="@color/match1" />
+
+        <Button
+            android:id="@+id/cleatbtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="3dp"
+            android:layout_weight="1.5"
+            android:background="@drawable/btn_layout"
+            android:text="전체 초기화"
+            android:textColor="@color/match1" />
+    </LinearLayout>
+</RelativeLayout>

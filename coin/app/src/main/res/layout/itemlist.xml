@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_all"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
+    android:background="@color/match1"
+    android:orientation="vertical">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:fontFamily="@font/maple"
+                android:text="매수가:"
+                android:textColor="@color/match2" />
+
+            <EditText
+                android:id="@+id/itemprices"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:digits="0123456789."
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:fontFamily="@font/maple"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:descendantFocusability="beforeDescendants"
+                android:lines="1"
+                android:nextFocusDown="@id/itemcounts"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="0"
+                android:textColor="@color/match2"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:fontFamily="@font/maple"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:text="매수량:"
+                android:textColor="@color/match2" />
+
+            <EditText
+                android:id="@+id/itemcounts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:digits="0123456789."
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:fontFamily="@font/maple"
+                android:descendantFocusability="beforeDescendants"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:lines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:text="0"
+                android:textColor="@color/match2"
+                android:textSize="15dp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/itemtotalprice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_marginLeft="3dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:weightSum="6">
+
+        <TextView
+            android:id="@+id/itemrank"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:fontFamily="@font/maple"
+            android:text="#1"
+            android:textColor="@color/match2" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_weight="1"
+            android:fontFamily="@font/maple"
+            android:text="총 가격:"
+            android:textColor="@color/match2" />
+
+        <TextView
+            android:id="@+id/itemsums"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_weight="3"
+            android:fontFamily="@font/maple"
+            android:gravity="right"
+            android:text="0"
+            android:textColor="@color/match2" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="3dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/maple"
+            android:text="원"
+            android:textColor="@color/match2" />
+    </LinearLayout>
+
+</LinearLayout>
