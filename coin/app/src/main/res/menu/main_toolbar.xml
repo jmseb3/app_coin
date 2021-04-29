@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/action_save"
+        android:id="@+id/action_new"
         android:icon="@drawable/ic_baseline_open_in_new_24"
         android:title="새로운 항목 만들기"
         app:showAsAction="always" />

@@ -8,49 +8,120 @@
     android:orientation="vertical"
     tools:context=".MainFragment">
 
+
     <LinearLayout
         android:id="@+id/area_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar_main"
-        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
-        android:weightSum="5">
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@drawable/solid_layout"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:fontFamily="@font/maple"
-            android:text="평균단가 : "
-            android:textColor="@color/match1"
-            android:textSize="30dp" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:weightSum="5">
 
-        <TextView
-            android:id="@+id/totalavg"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:fontFamily="@font/maple"
-            android:gravity="right"
-            android:text="0"
-            android:textColor="@color/match1"
-            android:textSize="20dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="left"
+                android:fontFamily="@font/maple"
+                android:text="평균 매수 단가 : "
+                android:textColor="@color/match1"
+                android:textSize="20sp" />
 
-        <TextView
-            android:layout_width="0dp"
+            <TextView
+                android:id="@+id/totalavg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:fontFamily="@font/maple"
+                android:gravity="right"
+                android:text="0"
+                android:textColor="@color/match1"
+                android:textSize="20dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="3dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/maple"
-            android:text="원"
-            android:textColor="@color/match1"
-            android:textSize="30dp" />
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:weightSum="5">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="left"
+                android:fontFamily="@font/maple"
+                android:text="총 매수 금액 : "
+                android:textColor="@color/match1"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/totalprice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:fontFamily="@font/maple"
+                android:gravity="right"
+                android:text="0"
+                android:textColor="@color/match1"
+                android:textSize="20dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp"
+            android:paddingRight="30dp"
+            android:weightSum="5">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:gravity="left"
+                android:fontFamily="@font/maple"
+                android:text="총 매수 량 : "
+                android:textColor="@color/match1"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/totalcount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:fontFamily="@font/maple"
+                android:gravity="right"
+                android:text="0"
+                android:textColor="@color/match1"
+                android:textSize="20dp" />
+
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
@@ -84,10 +155,10 @@
 
 
     <LinearLayout
-        android:layout_alignParentBottom="true"
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:orientation="horizontal"

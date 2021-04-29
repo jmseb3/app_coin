@@ -8,7 +8,7 @@ interface dbDao {
 
     // 코인정보 관련
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCouinInfoData(coinInfo: CoinInfo)
+    fun insertCoinInfoData(coinInfo: CoinInfo) : Long
 
     @Delete
     fun deleteCoinInfoData(coinInfo: CoinInfo)
@@ -16,20 +16,38 @@ interface dbDao {
     @Query("SELECT * FROM CoinInfo WHERE coinId=:coinId")
     fun getCoinInfoDataById(coinId: Int): CoinInfo
 
+    @Query("SELECT coinName FROM CoinInfo WHERE coinId=:coinId")
+    fun getCoinInfoNameById(coinId: Int): String
+
+    @Query("SELECT coinId FROM CoinInfo WHERE coinName=:coinName")
+    fun getCoinInfoIdByName(coinName: String): Int
+
+    @Query("SELECT coinName FROM CoinInfo")
+    fun getCoinInfoNameList(): List<String>
+
     @Query("SELECT * FROM CoinInfo ")
     fun getCoinInfoLiveData(): LiveData<List<CoinInfo>>
 
     @Query("UPDATE coininfo SET coinName=:coinName WHERE coinId=:coinId")
     fun updateCoinInfoName(coinId: Int, coinName: String)
 
-//    코인디테일관련련
+    @Query("DELETE FROM coininfo WHERE coinId =:id")
+    fun deleteCoinInfolById(id: Int)
 
+//    코인디테일관련련
 
     @Query("SELECT * FROM coindetail WHERE coinId=:coinId")
     fun getCoinDetailById(coinId: Int): LiveData<List<CoinDetail>>
 
     @Query("SELECT * FROM coindetail WHERE coinId=:coinId")
     fun getCoinDetailByIdNotLive(coinId: Int): List<CoinDetail>
+
+    @Query("SELECT coinPrice FROM coindetail WHERE coinId=:coinId")
+    fun getCoinDetailPriceById(coinId: Int): List<Float>
+
+    @Query("SELECT coinCount FROM coindetail WHERE coinId=:coinId")
+    fun getCoinDetailCountById(coinId: Int): List<Float>
+
 
     @Query("SELECT id FROM coindetail WHERE coinId=:coinId")
     fun getCoinDetailId(coinId: Int): List<Int>
@@ -53,7 +71,7 @@ interface dbDao {
     fun updateCoinDetailByCoinitemIdPrice(id: Int, coinPrice: Float)
 
     @Query("DELETE From coindetail WHERE coinId=:coinId")
-    fun clearCoinDetail(coinId:Int)
+    fun clearCoinDetail(coinId: Int)
 
     @Transaction
     @Query("SELECT * FROM coininfo")

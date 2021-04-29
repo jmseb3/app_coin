@@ -23,13 +23,11 @@ class ListFragment : Fragment() {
     ): View? {
         binding = FragmentListBinding.inflate(inflater, container, false)
 
-        val prefs: SharedPreferences =
-            requireContext().getSharedPreferences("coindata", MODE_PRIVATE)
-        val editor = prefs.edit()
         val db = AppDatabase.getInstance(requireContext())
+        mainActivity!!.binding.mainTitle.text ="내 코인 리스트"
 
         db.dbDao().getCoinInfoLiveData().observe(this, Observer {
-            adapter = ListRecyclerAdaper(it, requireContext())
+            adapter = ListRecyclerAdaper(it, requireContext(),requireFragmentManager(),mainActivity!!)
             binding.listRecylcer.adapter = adapter
         })
 

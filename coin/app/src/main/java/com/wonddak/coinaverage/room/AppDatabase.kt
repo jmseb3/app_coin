@@ -27,7 +27,7 @@ abstract class AppDatabase : RoomDatabase() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             CoroutineScope(Dispatchers.IO).launch {
-                                getInstance(context).dbDao().insertCouinInfoData(CoinInfo(1,"메인코인"))
+                                getInstance(context).dbDao().insertCoinInfoData(CoinInfo(1,"메인코인"))
                                 getInstance(context).dbDao().insertCoinDetailData(CoinDetail(null,1))
                                 getInstance(context).dbDao().insertCoinDetailData(CoinDetail(null,1))
                             }

@@ -7,12 +7,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.wonddak.coinaverage.databinding.FragmentListBinding
 import com.wonddak.coinaverage.databinding.FragmentMainBinding
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
@@ -27,17 +24,16 @@ class MainFragment : Fragment() {
     private lateinit var binding: FragmentMainBinding
 
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        val prefs: SharedPreferences = requireContext().getSharedPreferences("coindata",
+        val prefs: SharedPreferences = requireContext().getSharedPreferences(
+            "coindata",
             Context.MODE_PRIVATE
         )
-        val editor = prefs.edit()
         val db = AppDatabase.getInstance(requireContext())
         val iddata = prefs.getInt("iddata", 1)
         val format = prefs.getString("dec", "#,###.00")
@@ -51,26 +47,42 @@ class MainFragment : Fragment() {
             )
         )
 
-        var sum :Float
-        var count :Float
+        var sum: Float
+        var count: Float
+
+        GlobalScope.launch(Dispatchers.IO) {
+            var name = db.dbDao().getCoinInfoNameById(iddata)
+            launch(Dispatchers.Main) {
+                mainActivity!!.binding.mainTitle.text = name
+            }
+        }
 
         db.dbDao().getCoinDetailById(iddata).observe(this, Observer {
+
             adapter = coinRecylcerAdapter(requireContext(), it, dec, mainActivity!!, prefs)
             binding.coinrecycler.adapter = adapter
 
             sum = 0.0F
             count = 0.0F
 
+
             for (i in it.indices) {
                 sum += (it[i].coinPrice * it[i].coinCount)
                 count += it[i].coinCount
             }
-            var avg = sum / count
-            if (count != 0.0F) {
-                binding.totalavg.text = dec.format(avg).toString()
-            } else {
-                binding.totalavg.text = 0.toString()
 
+            var avg = sum / count
+            if (sum != 0.0F) {
+                binding.totalprice.text = dec.format(sum).toString() + "원"
+            } else {
+                binding.totalprice.text = 0.toString() + "원"
+            }
+            binding.totalcount.text = count.toString() +"개"
+
+            if (count != 0.0F) {
+                binding.totalavg.text = dec.format(avg).toString() + "원"
+            } else {
+                binding.totalavg.text = 0.toString() + "원"
 
             }
         })

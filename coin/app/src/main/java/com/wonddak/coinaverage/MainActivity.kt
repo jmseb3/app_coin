@@ -2,7 +2,9 @@ package com.wonddak.coinaverage
 
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -30,7 +32,7 @@ import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
     private lateinit var mAdView: AdView
     private var mDrawerLayout: DrawerLayout? = null
     private var backKeyPressedTime: Long = 0
@@ -56,29 +58,34 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.main_frag_area, MainFragment())
             .commit()
 
-        val prefs: SharedPreferences = getSharedPreferences("coindata", MODE_PRIVATE)
-        val format = prefs.getString("dec", "#,###.00")
 
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             menuItem.isChecked = true
             mDrawerLayout!!.closeDrawers()
             val title = menuItem.title.toString()
             when (menuItem.itemId) {
+
+                R.id.nav_rate -> {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.addCategory(Intent.CATEGORY_DEFAULT)
+                    intent.data = Uri.parse("market://details?id=com.wonddak.coinaverage")
+                    startActivity(intent)
+                }
                 R.id.nav_list -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, ListFragment())
                         .commit()
-                    type =2
-                    invalidateOptionsMenu()
+//                    type =2
+//                    invalidateOptionsMenu()
                 }
                 R.id.nav_main -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, MainFragment())
                         .commit()
-                    type =1
-                    invalidateOptionsMenu()
+//                    type =1
+//                    invalidateOptionsMenu()
 
                 }
                 R.id.nav_mail -> {
@@ -90,8 +97,7 @@ class MainActivity : AppCompatActivity() {
                         arrayOf("#,###", "#,###.0", "#,###.00", "#,###.000", "#,###.0000")
 
                     val builder = AlertDialog.Builder(this@MainActivity)
-                    val prefs: SharedPreferences =
-                        getSharedPreferences("coindata", MODE_PRIVATE)
+                    val prefs = getSharedPreferences("coindata", MODE_PRIVATE)
                     val editor = prefs.edit()
 
                     builder.setTitle("소수점 표시 방식 변경")
@@ -132,9 +138,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (type == 1) {
             menuInflater.inflate(R.menu.main_toolbar, menu)
-        } else if (type == 2) {
-            menuInflater.inflate(R.menu.main_toolbar2, menu)
         }
+//        } else if (type == 2) {
+//            menuInflater.inflate(R.menu.main_toolbar2, menu)
+//        }
         return true
     }
 
@@ -144,8 +151,8 @@ class MainActivity : AppCompatActivity() {
                 mDrawerLayout!!.openDrawer(GravityCompat.START)
 
             }
-            R.id.action_save -> {
-                val db = AppDatabase.getInstance(this)
+            R.id.action_new -> {
+                Dialog(this, this, supportFragmentManager).newGameStart(1, null)
             }
         }
         return super.onOptionsItemSelected(item)
