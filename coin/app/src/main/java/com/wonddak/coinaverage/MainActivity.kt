@@ -62,7 +62,6 @@ class MainActivity : AppCompatActivity() {
         binding.navigationView.setNavigationItemSelectedListener { menuItem ->
             menuItem.isChecked = true
             mDrawerLayout!!.closeDrawers()
-            val title = menuItem.title.toString()
             when (menuItem.itemId) {
 
                 R.id.nav_rate -> {
@@ -89,7 +88,13 @@ class MainActivity : AppCompatActivity() {
 
                 }
                 R.id.nav_mail -> {
-                    Toast.makeText(this, title, Toast.LENGTH_SHORT).show();
+                    val email = Intent(Intent.ACTION_SEND)
+                    email.type = "plain/text"
+                    val address = arrayOf<String>("jmseb2@gmail.com")
+                    email.putExtra(Intent.EXTRA_EMAIL, address)
+                    email.putExtra(Intent.EXTRA_SUBJECT, "<코인 평단 계산 도우미 관련 문의입니다.>")
+                    email.putExtra(Intent.EXTRA_TEXT, "내용:")
+                    startActivity(email)
                 }
                 R.id.nav_setting -> {
                     val itemshow = arrayOf("소수점 없음", "소수점 1개", "소수점 2개(기본)", "소수점 3개", "소수점 4개")
