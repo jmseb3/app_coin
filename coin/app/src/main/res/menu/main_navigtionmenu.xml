@@ -14,6 +14,10 @@
                 android:icon="@drawable/ic_baseline_format_list_numbered_24"
                 android:title="저장 목록" />
             <item
+                android:id="@+id/nav_graph"
+                android:icon="@drawable/ic_baseline_bar_chart_24"
+                android:title="손절% 복구표" />
+            <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_baseline_settings_24"
                 android:title="소수점 표시 형식 변경" />

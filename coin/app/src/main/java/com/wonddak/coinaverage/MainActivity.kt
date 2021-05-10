@@ -106,17 +106,18 @@ class MainActivity : AppCompatActivity() {
                         .beginTransaction()
                         .replace(R.id.main_frag_area, ListFragment())
                         .commit()
-//                    type =2
-//                    invalidateOptionsMenu()
                 }
                 R.id.nav_main -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, MainFragment())
                         .commit()
-//                    type =1
-//                    invalidateOptionsMenu()
-
+                }
+                R.id.nav_graph -> {
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.main_frag_area, GraphFragment())
+                        .commit()
                 }
                 R.id.nav_mail -> {
                     val email = Intent(Intent.ACTION_SEND)

@@ -8,6 +8,7 @@
     android:background="@color/match2"
     android:orientation="vertical">
 
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
