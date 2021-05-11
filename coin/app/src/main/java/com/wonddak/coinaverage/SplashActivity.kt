@@ -17,13 +17,8 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            // This method will be executed once the timer is over
-            // Start your app main activity
-
             startActivity(Intent(this, MainActivity::class.java))
             overridePendingTransition(0,0)
-
-            // close this activity
             finish()
         }, SPLASH_TIME_OUT)
     }

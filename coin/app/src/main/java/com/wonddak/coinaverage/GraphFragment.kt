@@ -24,6 +24,7 @@ class GraphFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentGraphBinding.inflate(inflater, container, false)
+        mainActivity!!.binding.mainTitle.text ="손절% 계산기"
         val dec = DecimalFormat("###.00")
         val itemList = listOf<String>(
             "손절매 못한 손실", "복구해야할 수익률",

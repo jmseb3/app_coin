@@ -53,11 +53,16 @@ class MainFragment : Fragment() {
         GlobalScope.launch(Dispatchers.IO) {
             var name = db.dbDao().getCoinInfoNameById(iddata)
             launch(Dispatchers.Main) {
-                mainActivity!!.binding.mainTitle.text = name
+                try {
+                    mainActivity!!.binding.mainTitle.text = name
+                } catch (e:NullPointerException){
+
+                }
+
             }
         }
 
-        db.dbDao().getCoinDetailById(iddata).observe(this, Observer {
+        db.dbDao().getCoinDetailById(iddata).observe(viewLifecycleOwner, Observer {
 
             adapter = coinRecylcerAdapter(requireContext(), it, dec, mainActivity!!, prefs)
             binding.coinrecycler.adapter = adapter
