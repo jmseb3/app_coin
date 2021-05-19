@@ -24,7 +24,7 @@ class GraphFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentGraphBinding.inflate(inflater, container, false)
-        mainActivity!!.binding.mainTitle.text ="손절% 계산기"
+        mainActivity!!.binding.mainTitle.text = "손절% 계산기"
         val dec = DecimalFormat("###.00")
         val itemList = listOf<String>(
             "손절매 못한 손실", "복구해야할 수익률",
@@ -58,22 +58,30 @@ class GraphFragment : Fragment() {
             }
 
             override fun afterTextChanged(s: Editable?) {
-                when {
-                    s.toString().isEmpty() -> {
-                        binding.output.setText("")
-                    }
-                    s.toString().toFloat() > 100 -> {
-                        Toast.makeText(mainActivity!!, "손실은 100%보다 클수 없습니다", Toast.LENGTH_SHORT)
-                            .show()
-                        binding.input.setText("")
-                    }
-                    else -> {
-                        val minusPer = s.toString().toFloat() / 100
-                        val data = dec.format((minusPer / (1 - minusPer)) * 100)
-                        binding.output.setText(data.toString())
+                try {
+                    when {
+
+                        s.toString().isEmpty() -> {
+                            binding.output.setText("")
+                        }
+                        s.toString().toFloat() > 100 -> {
+                            Toast.makeText(mainActivity!!, "손실은 100%보다 클수 없습니다", Toast.LENGTH_SHORT)
+                                .show()
+                            binding.input.setText("")
+                        }
+                        else -> {
+                            val minusPer = s.toString().toFloat() / 100
+                            val data = dec.format((minusPer / (1 - minusPer)) * 100)
+                            binding.output.setText(data.toString())
 
 
+                        }
                     }
+
+                } catch (e: NumberFormatException) {
+                    inputbox.setText("")
+                    inputbox.setSelection(inputbox.length())
+                    Toast.makeText(mainActivity!!, "숫자만 입력해주세요", Toast.LENGTH_SHORT).show()
                 }
             }
 

@@ -17,10 +17,25 @@
                 android:id="@+id/nav_graph"
                 android:icon="@drawable/ic_baseline_bar_chart_24"
                 android:title="손절% 계산기" />
+
+        </menu>
+    </item>
+    <item
+        android:id="@+id/nav_mid"
+        android:title="설정"
+        android:icon="@drawable/ic_baseline_settings_24">
+        <menu
+            android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_baseline_settings_24"
                 android:title="소수점 표시 형식 변경" />
+
+            <item
+                android:id="@+id/nav_next_setting"
+                android:icon="@drawable/ic_baseline_settings_24"
+                android:title="입력후 다음 항목 자동이동" />
+
         </menu>
     </item>
     <item

@@ -22,7 +22,7 @@
             android:gravity="center"
             android:text="정말 삭제하시겠습니까?"
             android:textColor="@color/match1"
-            android:textSize="30dp" />
+            android:textSize="24sp" />
 
 
     </LinearLayout>
@@ -50,7 +50,7 @@
                 android:fontFamily="@font/maple"
                 android:text="확인"
                 android:textColor="@color/match1"
-                android:textSize="20dp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <Button
@@ -64,7 +64,7 @@
                 android:fontFamily="@font/maple"
                 android:text="취소"
                 android:textColor="@color/match1"
-                android:textSize="20dp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
 

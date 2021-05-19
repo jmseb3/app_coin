@@ -42,6 +42,7 @@ interface dbDao {
     @Query("SELECT * FROM coindetail WHERE coinId=:coinId")
     fun getCoinDetailByIdNotLive(coinId: Int): List<CoinDetail>
 
+
     @Query("SELECT coinPrice FROM coindetail WHERE coinId=:coinId")
     fun getCoinDetailPriceById(coinId: Int): List<Float>
 

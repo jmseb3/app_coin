@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wonddak.coinaverage.databinding.FragmentListBinding
 import com.wonddak.coinaverage.room.AppDatabase
+import java.lang.NullPointerException
 
 class ListFragment : Fragment() {
     private var mainActivity: MainActivity? = null
@@ -25,7 +26,7 @@ class ListFragment : Fragment() {
         binding = FragmentListBinding.inflate(inflater, container, false)
 
         val db = AppDatabase.getInstance(requireContext())
-        mainActivity!!.binding.mainTitle.text ="내 코인 리스트"
+        mainActivity!!.binding.mainTitle.text = "내 코인 리스트"
 
         val manager = ReviewManagerFactory.create(mainActivity!!)
         val request = manager.requestReviewFlow()
@@ -33,11 +34,15 @@ class ListFragment : Fragment() {
         request.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val reviewInfo = task.result
-                val flow = manager.launchReviewFlow(mainActivity!!, reviewInfo)
-                flow.addOnCompleteListener { _ ->
-                    // The flow has finished. The API does not indicate whether the user
-                    // reviewed or not, or even whether the review dialog was shown. Thus, no
-                    // matter the result, we continue our app flow.
+                try {
+                    val flow = manager.launchReviewFlow(mainActivity!!, reviewInfo)
+                    flow.addOnCompleteListener { _ ->
+                        // The flow has finished. The API does not indicate whether the user
+                        // reviewed or not, or even whether the review dialog was shown. Thus, no
+                        // matter the result, we continue our app flow.
+                    }
+                } catch (e:NullPointerException){
+
                 }
             } else {
                 // There was some problem, log or handle the error code.
@@ -45,8 +50,10 @@ class ListFragment : Fragment() {
             }
         }
 
+
         db.dbDao().getCoinInfoLiveData().observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            adapter = ListRecyclerAdaper(it, requireContext(),parentFragmentManager,mainActivity!!)
+            adapter =
+                ListRecyclerAdaper(it, requireContext(), parentFragmentManager, mainActivity!!)
             binding.listRecylcer.adapter = adapter
         })
 

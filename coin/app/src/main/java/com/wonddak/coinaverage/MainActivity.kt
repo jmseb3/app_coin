@@ -46,13 +46,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mAdView: AdView
     private var mDrawerLayout: DrawerLayout? = null
     private var backKeyPressedTime: Long = 0
-
     private lateinit var appUpdateManager: AppUpdateManager
 
-    var selectedPostion = -1
-    var priceorcount = false
 
-    var type = 1
+    var nowPosition =-1
+    var priceOrCount = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,9 +142,35 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "표시형식을 변경했습니다.", Toast.LENGTH_SHORT)
                             .show()
                         dialog.dismiss()
-                        finish()
-                        startActivity(intent)
-                        overridePendingTransition(0, 0)
+                        this.recreate()
+                        overridePendingTransition(0,0)
+                    }
+                    builder.show()
+                }
+                R.id.nav_next_setting -> {
+                    val itemshow = arrayOf("자동이동 허용", "자동이동 비허용(기본)")
+                    val builder = AlertDialog.Builder(this@MainActivity)
+                    val prefs = getSharedPreferences("coindata", MODE_PRIVATE)
+                    val editor = prefs.edit()
+
+                    builder.setTitle("입력후 다음항목 자동이동 변경")
+                    builder.setSingleChoiceItems(itemshow, 1) { dialog, which ->
+                        if(which ==0){
+                            editor.putBoolean("next",true)
+                            editor.commit()
+                            Toast.makeText(this@MainActivity, "다음항목 이동 : 허용", Toast.LENGTH_SHORT).show()
+                            nowPosition = -1
+                            priceOrCount= false
+                        }else{
+                            editor.putBoolean("next",false)
+                            editor.commit()
+                            Toast.makeText(this@MainActivity, "다음항목 이동 : 비허용", Toast.LENGTH_SHORT).show()
+                        }
+
+
+                        dialog.dismiss()
+                        this.recreate()
+                        overridePendingTransition(0,0)
                     }
                     builder.show()
                 }
@@ -161,8 +185,6 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-
-
     fun hideKeyboard(editText: EditText) {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(editText.windowToken, 0)
@@ -172,6 +194,7 @@ class MainActivity : AppCompatActivity() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -210,12 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (type == 1) {
-            menuInflater.inflate(R.menu.main_toolbar, menu)
-        }
-//        } else if (type == 2) {
-//            menuInflater.inflate(R.menu.main_toolbar2, menu)
-//        }
+        menuInflater.inflate(R.menu.main_toolbar, menu)
         return true
     }
 

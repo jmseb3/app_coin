@@ -8,18 +8,17 @@
     android:orientation="vertical"
     tools:context=".MainFragment">
 
-
     <LinearLayout
         android:id="@+id/area_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/solid_layout"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,8 +33,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="left"
                 android:fontFamily="@font/maple"
+                android:gravity="left"
                 android:text="평균 매수 단가 : "
                 android:textColor="@color/match1"
                 android:textSize="15sp" />
@@ -55,9 +54,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:paddingLeft="30dp"
@@ -68,8 +67,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="left"
                 android:fontFamily="@font/maple"
+                android:gravity="left"
                 android:text="총 매수 금액 : "
                 android:textColor="@color/match1"
                 android:textSize="15sp" />
@@ -89,9 +88,9 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:paddingLeft="30dp"
@@ -102,8 +101,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="left"
                 android:fontFamily="@font/maple"
+                android:gravity="left"
                 android:text="총 매수 량 : "
                 android:textColor="@color/match1"
                 android:textSize="15sp" />
@@ -125,17 +124,25 @@
 
     </LinearLayout>
 
-
-    <TextView
+    <LinearLayout
         android:id="@+id/infotext"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/area_top"
         android:layout_centerInParent="true"
         android:layout_marginTop="3dp"
-        android:fontFamily="@font/maple"
-        android:text="각 항목별 짧게 눌러 초기화/길게눌러 삭제 가능합니다. "
-        android:textColor="@color/match1" />
+        android:gravity="center"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/top_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="@font/maple"
+            android:text="각 항목별 짧게 눌러 초기화/길게눌러 삭제 가능합니다. "
+            android:textColor="@color/match1" />
+
+    </LinearLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView

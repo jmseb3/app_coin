@@ -29,7 +29,7 @@
                 android:id="@+id/main_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|left"
+                android:layout_gravity="left"
                 android:layout_marginTop="10dp"
                 android:fontFamily="@font/maple"
                 android:gravity="center"

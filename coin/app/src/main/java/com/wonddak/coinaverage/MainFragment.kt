@@ -3,6 +3,7 @@ package com.wonddak.coinaverage
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearSmoothScroller
 import com.wonddak.coinaverage.databinding.FragmentMainBinding
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
@@ -37,7 +39,6 @@ class MainFragment : Fragment() {
         val db = AppDatabase.getInstance(requireContext())
         val iddata = prefs.getInt("iddata", 1)
         val format = prefs.getString("dec", "#,###.00")
-
         val dec = DecimalFormat(format)
 
         binding.coinrecycler.addItemDecoration(
@@ -55,22 +56,31 @@ class MainFragment : Fragment() {
             launch(Dispatchers.Main) {
                 try {
                     mainActivity!!.binding.mainTitle.text = name
-                } catch (e:NullPointerException){
+
+                } catch (e: NullPointerException) {
 
                 }
 
             }
         }
-
         db.dbDao().getCoinDetailById(iddata).observe(viewLifecycleOwner, Observer {
 
-            adapter = coinRecylcerAdapter(requireContext(), it, dec, mainActivity!!, prefs)
+            sum = 0.0f
+            count = 0.0f
+            val next_check = prefs.getBoolean("next",false)
+            binding.coinrecycler.scrollToPosition(it.size-1)
+            binding.coinrecycler.scrollToPosition(0)
+            if(!next_check){
+                mainActivity!!.nowPosition = -1
+                mainActivity!!.priceOrCount = false
+            }
+
+            adapter = coinRecylcerAdapter(mainActivity!!, it, dec, mainActivity!!, prefs)
             binding.coinrecycler.adapter = adapter
-
-            sum = 0.0F
-            count = 0.0F
-
-
+            val checkpos = mainActivity!!.nowPosition
+            if (checkpos != -1) {
+                binding.coinrecycler.scrollToPosition(checkpos)
+            }
             for (i in it.indices) {
                 sum += (it[i].coinPrice * it[i].coinCount)
                 count += it[i].coinCount
@@ -78,16 +88,16 @@ class MainFragment : Fragment() {
 
             var avg = sum / count
             if (sum != 0.0F) {
-                binding.totalprice.text = dec.format(sum).toString() + "원"
+                binding.totalprice.text = WonText(sum)
             } else {
-                binding.totalprice.text = 0.toString() + "원"
+                binding.totalprice.text = WonText(0.0f)
             }
-            binding.totalcount.text = count.toString() +"개"
+            binding.totalcount.text = count.toString() + "개"
 
             if (count != 0.0F) {
-                binding.totalavg.text = dec.format(avg).toString() + "원"
+                binding.totalavg.text = WonText(avg)
             } else {
-                binding.totalavg.text = 0.toString() + "원"
+                binding.totalavg.text = WonText(0.0f)
 
             }
         })
@@ -97,8 +107,8 @@ class MainFragment : Fragment() {
         binding.addbtn.setOnClickListener {
             GlobalScope.launch(Dispatchers.IO) {
                 db.dbDao().insertCoinDetailData(CoinDetail(null, iddata))
-                mainActivity!!.selectedPostion = -1
-                mainActivity!!.priceorcount = false
+                mainActivity!!.nowPosition = -1
+                mainActivity!!.priceOrCount = false
             }
         }
 
@@ -109,14 +119,24 @@ class MainFragment : Fragment() {
                 db.dbDao().clearCoinDetail(iddata)
                 db.dbDao().insertCoinDetailData(CoinDetail(null, iddata))
                 db.dbDao().insertCoinDetailData(CoinDetail(null, iddata))
-                mainActivity!!.selectedPostion = -1
-                mainActivity!!.priceorcount = false
+                mainActivity!!.nowPosition = -1
+                mainActivity!!.priceOrCount = false
             }
         }
 
 
 
         return binding.root
+    }
+
+    fun WonText(value: Float): String {
+        val prefs: SharedPreferences = requireContext().getSharedPreferences(
+            "coindata",
+            Context.MODE_PRIVATE
+        )
+        val format = prefs.getString("dec", "#,###.00")
+        val dec = DecimalFormat(format)
+        return dec.format(value).toString() + "원"
     }
 
     override fun onAttach(context: Context) {
