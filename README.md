@@ -14,3 +14,8 @@
 ![6](https://user-images.githubusercontent.com/63912638/131365538-0dfa9225-a2a0-4f31-81b1-6776f10001b3.png)
 
 # 업데이트 내역
+[21/08/31 업데이트] 
+![Screenshot_1630410171](https://user-images.githubusercontent.com/63912638/131496561-47976cb7-3c2b-4ae0-913e-aaf0746ba29a.png) 
+> Retrofit 이용 하여 실시간 정보 불러오기 기능  
+> 필터링기능으로 편하게 
+
