@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/match2"
     android:orientation="vertical"
-    tools:context=".ListFragment">
+    tools:context=".ui.fragment.ListFragment">
 
     <TextView
         android:layout_marginTop="10dp"

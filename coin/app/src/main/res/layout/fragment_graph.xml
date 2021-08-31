@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/match2"
     android:orientation="vertical"
-    tools:context=".GraphFragment">
+    tools:context=".ui.fragment.GraphFragment">
 
 
     <RelativeLayout

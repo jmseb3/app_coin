@@ -3,7 +3,7 @@
     package="com.wonddak.coinaverage">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:allowBackup="true"
         android:icon="@drawable/icon"
@@ -11,17 +11,23 @@
         android:roundIcon="@drawable/icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.CoinAverage">
-        android:windowSoftInputMode="stateHidden|adjustPan"
+        <activity
+            android:name=".ui.CoinInfoActivity"
+            android:exported="true" />
+        <activity
+            android:name=".coinInfoActivity"
+            android:exported="true" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.SplashActivity"
             android:screenOrientation="portrait"
             android:taskAffinity=".FLAG_ACTIVITY_NO_HISTORY">
             <intent-filter>

@@ -17,6 +17,10 @@
                 android:id="@+id/nav_graph"
                 android:icon="@drawable/ic_baseline_bar_chart_24"
                 android:title="손절% 계산기" />
+            <item
+                android:id="@+id/nav_info"
+                android:icon="@drawable/ic_baseline_bar_chart_24"
+                android:title="실시간 시세" />
 
         </menu>
     </item>
