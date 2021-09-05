@@ -12,8 +12,8 @@ android {
         applicationId "com.wonddak.coinaverage"
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 12
-        versionName "3.5"
+        versionCode 14
+        versionName "4.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -76,4 +76,8 @@ dependencies {
     // Retrofit 라이브러리
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    // Skip this if you don't want to use integration libraries or configure Glide.
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }

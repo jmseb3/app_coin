@@ -1,41 +1,28 @@
 package com.wonddak.coinaverage.adapter
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.provider.Settings
-import android.util.Log
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.Filter
-import android.widget.Filter.FilterResults
 import android.widget.Filterable
-import android.widget.Toast
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.wonddak.coinaverage.API.DetailArr
 import com.wonddak.coinaverage.API.upBitClient
-import com.wonddak.coinaverage.API.upbitArr
 import com.wonddak.coinaverage.API.upbitList
-import com.wonddak.coinaverage.ui.Dialog
-import com.wonddak.coinaverage.ui.MainActivity
-import com.wonddak.coinaverage.ui.fragment.MainFragment
-import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.databinding.ItemCoinInfoBinding
-import com.wonddak.coinaverage.databinding.ItemCoinListBinding
-import com.wonddak.coinaverage.room.AppDatabase
-import com.wonddak.coinaverage.room.CoinInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.IndexOutOfBoundsException
 import java.text.DecimalFormat
 
 class InfoRecyclerAdaper(
     val itemlist: ArrayList<upbitList>,
     val context: Context,
+    val ck_krw: CheckBox,
+    val ck_btc: CheckBox,
+    val ck_usd: CheckBox
 ) : RecyclerView.Adapter<InfoRecyclerAdaper.ViewHolder>(), Filterable {
 
     var unFilteredlist: ArrayList<upbitList>? = null
@@ -51,8 +38,6 @@ class InfoRecyclerAdaper(
         val eng_name = binding.engName
         val market = binding.marketInfo
         val now_price = binding.nowPrice
-        val next = binding.detailArrow
-
 
     }
 
@@ -68,12 +53,6 @@ class InfoRecyclerAdaper(
         holder.kor_name.text = filteredList!![position].korean_name
         holder.eng_name.text = filteredList!![position].english_name
         holder.market.text = filteredList!![position].market
-        holder.next.setOnClickListener {
-            for (xx in filteredList!!) {
-                Log.d("datas", "" + xx)
-
-            }
-        }
         upBitClient.api.getinfo(filteredList!![position].market)
             .enqueue(object : Callback<DetailArr> {
                 override fun onResponse(
@@ -102,8 +81,7 @@ class InfoRecyclerAdaper(
                 }
 
                 override fun onFailure(call: Call<DetailArr>, t: Throwable) {
-                    Log.d("datas_cycle", "" + t)
-                    Log.d("datas_cycle", "실패")
+
                 }
             })
 
@@ -118,16 +96,22 @@ class InfoRecyclerAdaper(
         return object : Filter() {
             override fun performFiltering(constraint: CharSequence): FilterResults {
                 val charString = constraint.toString()
-                if (charString.isEmpty()) {
+                if (charString.isEmpty() ) {
                     filteredList = itemlist
                 } else {
                     val filteringList: ArrayList<upbitList> = ArrayList()
                     for (name in unFilteredlist!!) {
-                        if (name.korean_name.toLowerCase()
-                                .contains(charString.toLowerCase()) or name.english_name.toLowerCase()
-                                .contains(charString.toLowerCase())
+                        if (
+                            (name.korean_name.toLowerCase().contains(charString.toLowerCase())
+                                    or
+                                    name.english_name.toLowerCase()
+                                        .contains(charString.toLowerCase()))
                         ) {
-                            filteringList.add(name)
+                            val temp = name.market.slice(IntRange(0, 2))
+                            if ((ck_krw.isChecked and (temp == "KRW")) or (ck_btc.isChecked and (temp == "BTC")) or (ck_usd.isChecked and (temp == "USD"))) {
+                                filteringList.add(name)
+                            }
+
                         }
                     }
                     filteredList = filteringList

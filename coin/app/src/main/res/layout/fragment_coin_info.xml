@@ -12,34 +12,80 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/maplestory"
+        android:hint="검색할 코인을 입력해주세요"
         android:singleLine="true"
         android:textColor="@color/match1"
-        app:layout_constraintBottom_toTopOf="@id/infos"
+        app:layout_constraintBottom_toTopOf="@id/check_krw"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/infos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
         android:fontFamily="@font/maplestory"
         android:gravity="center"
-        android:text="업비트에 있는 코인정보를 불러오며 \n 실험적인 기능이므로 불안정할수있습니다."
+        android:text="마켓정보"
         android:textColor="@color/match1"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@id/recycler_test"
+        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/search_box" />
+
+
+    <CheckBox
+        android:id="@+id/check_krw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:buttonTint="@color/match1"
+        android:checked="true"
+        android:text="KRW"
+        app:layout_constraintBottom_toTopOf="@id/recycler_test"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintRight_toLeftOf="@id/check_btc"
+        app:layout_constraintTop_toBottomOf="@id/search_box" />
+
+    <CheckBox
+        android:id="@+id/check_btc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:buttonTint="@color/match1"
+        android:checked="false"
+        android:text="BTC"
+        app:layout_constraintBottom_toTopOf="@id/recycler_test"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintRight_toLeftOf="@id/check_UDST"
+        app:layout_constraintTop_toBottomOf="@id/search_box" />
+
+    <CheckBox
+        android:id="@+id/check_UDST"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:buttonTint="@color/match1"
+        android:checked="false"
+        android:text="USDT"
+        app:layout_constraintBottom_toTopOf="@id/recycler_test"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_box"
+        app:layout_constraintVertical_bias="1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_test"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/infos"
+        app:layout_constraintTop_toBottomOf="@id/check_krw"
         tools:listitem="@layout/item_coin_info" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

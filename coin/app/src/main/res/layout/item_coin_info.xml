@@ -21,68 +21,59 @@
 
             <TextView
                 android:id="@+id/kor_name"
-                android:textColor="@color/match2"
-                android:fontFamily="@font/maplestory"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:fontFamily="@font/maplestory"
                 android:text="비트코인"
+                android:textColor="@color/match2"
                 android:textSize="18sp"
-                app:layout_constraintBottom_toTopOf="@id/eng_name"
-                app:layout_constraintHorizontal_weight="6"
+                app:layout_constrainedWidth="true"
+                app:layout_constraintBottom_toTopOf="@id/market_info"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/market_info"
+                app:layout_constraintRight_toLeftOf="@id/eng_name"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/eng_name"
                 android:layout_width="0dp"
-                android:textColor="@color/match2"
-                android:fontFamily="@font/maplestory"
+                app:layout_constrainedWidth="true"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/maplestory"
                 android:text="Bitcoin"
+                android:textColor="@color/match2"
                 android:textSize="14sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/market_info"
-                app:layout_constraintTop_toBottomOf="@id/kor_name" />
+                app:layout_constraintBottom_toBottomOf="@id/kor_name"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintLeft_toRightOf="@id/kor_name"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/kor_name" />
 
             <TextView
                 android:id="@+id/market_info"
-                android:textColor="@color/match2"
-                android:fontFamily="@font/maplestory"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/maplestory"
                 android:text="KRW-BTC"
-                app:layout_constraintBottom_toTopOf="@id/now_price"
-                app:layout_constraintHorizontal_weight="3"
-                app:layout_constraintLeft_toRightOf="@id/kor_name"
-                app:layout_constraintRight_toLeftOf="@id/detail_arrow"
-                app:layout_constraintTop_toTopOf="@id/kor_name" />
+                android:textColor="@color/match2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/now_price"
+                app:layout_constraintTop_toBottomOf="@id/kor_name" />
 
             <TextView
                 android:id="@+id/now_price"
                 android:layout_width="0dp"
-                android:textColor="@color/match2"
+                android:layout_height="wrap_content"
                 android:fontFamily="@font/maplestory"
-                android:layout_height="wrap_content"
-                android:text="dddddd원"
-                app:layout_constraintBottom_toBottomOf="@id/eng_name"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintLeft_toRightOf="@id/eng_name"
-                app:layout_constraintRight_toLeftOf="@id/detail_arrow"
-                app:layout_constraintTop_toBottomOf="@id/market_info" />
-
-            <ImageView
-                android:id="@+id/detail_arrow"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
+                android:text="0KRW"
+                android:textColor="@color/match2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_weight="1"
                 app:layout_constraintLeft_toRightOf="@id/market_info"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/kor_name" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

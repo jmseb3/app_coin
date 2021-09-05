@@ -9,6 +9,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.wonddak.coinaverage.API.upBitClient
 import com.wonddak.coinaverage.API.upbitArr
 import com.wonddak.coinaverage.R
@@ -34,45 +37,83 @@ class CoinInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCoinInfoBinding.inflate(inflater, container, false)
-
         mainActivity!!.binding.mainTitle.text = "실시간 코인 정보"
         upBitClient.api.getlist().enqueue(object : Callback<upbitArr> {
-
             override fun onResponse(
                 call: Call<upbitArr>,
                 response: Response<upbitArr>
             ) {
                 if (response.isSuccessful) {
-                    infoadpaters = InfoRecyclerAdaper(response.body()!!, mainActivity!!)
+                    infoadpaters = InfoRecyclerAdaper(
+                        response.body()!!,
+                        mainActivity!!,
+                        binding.checkKrw,
+                        binding.checkBtc,
+                        binding.checkUDST
+                    )
                     binding.recyclerTest.adapter = infoadpaters
-                    binding.searchBox.addTextChangedListener(object : TextWatcher {
-                        override fun beforeTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            count: Int,
-                            after: Int
-                        ) {
 
-                        }
 
-                        override fun onTextChanged(
-                            s: CharSequence?,
-                            start: Int,
-                            before: Int,
-                            count: Int
-                        ) {
-                            infoadpaters!!.filter.filter(s)
-                        }
-
-                        override fun afterTextChanged(s: Editable?) {
-
-                        }
-                    })
                 }
 
             }
 
             override fun onFailure(call: Call<upbitArr>, t: Throwable) {
+
+            }
+        })
+
+
+        binding.checkBtc.setOnCheckedChangeListener { buttonView, isChecked ->
+            val temp = binding.searchBox.text
+            if (!isChecked) {
+                if (!binding.checkUDST.isChecked and !binding.checkBtc.isChecked) {
+                    binding.checkKrw.isChecked = true
+                }
+            }
+            binding.searchBox.text = temp
+
+        }
+        binding.checkKrw.setOnCheckedChangeListener { buttonView, isChecked ->
+            val temp = binding.searchBox.text
+            if (!isChecked) {
+                if (!binding.checkUDST.isChecked and !binding.checkBtc.isChecked) {
+                    binding.checkKrw.isChecked = true
+                }
+            }
+            binding.searchBox.text = temp
+
+        }
+        binding.checkUDST.setOnCheckedChangeListener { buttonView, isChecked ->
+            val temp = binding.searchBox.text
+            if (!isChecked) {
+                if (!binding.checkKrw.isChecked and !binding.checkBtc.isChecked) {
+                    binding.checkKrw.isChecked = true
+                }
+            }
+            binding.searchBox.text = temp
+
+        }
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+
+            }
+
+            override fun onTextChanged(
+                s: CharSequence?,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                infoadpaters!!.filter.filter(s)
+            }
+
+            override fun afterTextChanged(s: Editable?) {
 
             }
         })
