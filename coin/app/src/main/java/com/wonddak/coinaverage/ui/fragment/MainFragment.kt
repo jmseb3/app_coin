@@ -3,11 +3,14 @@ package com.wonddak.coinaverage.ui.fragment
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.preference.Preference
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.wonddak.coinaverage.coinRecylcerAdapter
@@ -32,11 +35,9 @@ class MainFragment : Fragment() {
     ): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        val prefs: SharedPreferences = requireContext().getSharedPreferences(
-            "coindata",
-            Context.MODE_PRIVATE
-        )
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity!!)
         val db = AppDatabase.getInstance(requireContext())
+
         val iddata = prefs.getInt("iddata", 1)
         val format = prefs.getString("dec", "#,###.00")
         val dec = DecimalFormat(format)
@@ -88,16 +89,16 @@ class MainFragment : Fragment() {
 
             var avg = sum / count
             if (sum != 0.0F) {
-                binding.totalprice.text = WonText(sum)
+                binding.totalprice.text = WonText(sum,prefs)
             } else {
-                binding.totalprice.text = WonText(0.0f)
+                binding.totalprice.text = WonText(0.0f,prefs)
             }
             binding.totalcount.text = count.toString() + "개"
 
             if (count != 0.0F) {
-                binding.totalavg.text = WonText(avg)
+                binding.totalavg.text = WonText(avg,prefs)
             } else {
-                binding.totalavg.text = WonText(0.0f)
+                binding.totalavg.text = WonText(0.0f,prefs)
 
             }
         })
@@ -129,11 +130,7 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    fun WonText(value: Float): String {
-        val prefs: SharedPreferences = requireContext().getSharedPreferences(
-            "coindata",
-            Context.MODE_PRIVATE
-        )
+    fun WonText(value: Float,prefs : SharedPreferences): String {
         val format = prefs.getString("dec", "#,###.00")
         val dec = DecimalFormat(format)
         return dec.format(value).toString() + "원"
@@ -144,6 +141,7 @@ class MainFragment : Fragment() {
         mainActivity = activity as MainActivity
 
     }
+
 
     override fun onDetach() {
         super.onDetach()

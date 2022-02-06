@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory>
+
+        <ListPreference
+            app:key="dec"
+            app:title="소수점 표시 형식 변경"
+            app:summary="앱 내의 보여지는 소수점 자리수를 변경합니다."
+            app:entries="@array/coin_data"
+            app:entryValues="@array/coin_data_value"
+            app:defaultValue="#,###.00"
+            app:negativeButtonText="@null"
+            app:positiveButtonText="@null"/>
+
+        <SwitchPreference
+            app:defaultValue="reply"
+            app:switchTextOff="비허용"
+            app:switchTextOn="허용"
+            app:key="next"
+            app:title="입력후 다음 항목으로 이동"
+            app:summary="항목입력후 커서 이동여부를 변경합니다."
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -1,0 +1,19 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="coin_data">
+        <item>소수점 없음</item>
+        <item>소수점 1개</item>
+        <item>소수점 2개</item>
+        <item>소수점 3개</item>
+        <item>소수점 4개</item>
+    </string-array>
+
+    <string-array name="coin_data_value">
+        <item>#,###</item>
+        <item>#,###.0</item>
+        <item>#,###.00</item>
+        <item>#,###.000</item>
+        <item>#,###.0000</item>
+
+    </string-array>
+</resources>

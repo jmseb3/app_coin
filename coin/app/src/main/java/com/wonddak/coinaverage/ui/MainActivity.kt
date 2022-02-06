@@ -3,8 +3,10 @@ package com.wonddak.coinaverage.ui
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
@@ -14,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.preference.PreferenceManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -30,7 +33,7 @@ import com.wonddak.coinaverage.ui.fragment.ListFragment
 import com.wonddak.coinaverage.ui.fragment.MainFragment
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     lateinit var binding: ActivityMainBinding
     private lateinit var mAdView: AdView
@@ -42,11 +45,23 @@ class MainActivity : AppCompatActivity() {
     var nowPosition = -1
     var priceOrCount = false
 
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "dec" || key == "next") {
+            Log.d("data","변경감지")
+            this.recreate()
+            overridePendingTransition(0,0)
+        }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mDrawerLayout = binding.drawerLayout
+
+        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.registerOnSharedPreferenceChangeListener(this)
 
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
@@ -122,55 +137,10 @@ class MainActivity : AppCompatActivity() {
                     email.putExtra(Intent.EXTRA_TEXT, "내용:")
                     startActivity(email)
                 }
-                R.id.nav_setting -> {
-                    val itemshow = arrayOf("소수점 없음", "소수점 1개", "소수점 2개(기본)", "소수점 3개", "소수점 4개")
-                    val items =
-                        arrayOf("#,###", "#,###.0", "#,###.00", "#,###.000", "#,###.0000")
-
-                    val builder = AlertDialog.Builder(this@MainActivity)
-                    val prefs = getSharedPreferences("coindata", MODE_PRIVATE)
-                    val editor = prefs.edit()
-
-                    builder.setTitle("소수점 표시 방식 변경")
-                    builder.setSingleChoiceItems(itemshow, 2) { dialog, which ->
-                        editor.putString("dec", items[which])
-                        editor.commit()
-                        Toast.makeText(this@MainActivity, "표시형식을 변경했습니다.", Toast.LENGTH_SHORT)
-                            .show()
-                        dialog.dismiss()
-                        this.recreate()
-                        overridePendingTransition(0, 0)
-                    }
-                    builder.show()
-                }
-                R.id.nav_next_setting -> {
-                    val itemshow = arrayOf("자동이동 허용", "자동이동 비허용(기본)")
-                    val builder = AlertDialog.Builder(this@MainActivity)
-                    val prefs = getSharedPreferences("coindata", MODE_PRIVATE)
-                    val editor = prefs.edit()
-
-                    builder.setTitle("입력후 다음항목 자동이동 변경")
-                    builder.setSingleChoiceItems(itemshow, 1) { dialog, which ->
-                        if (which == 0) {
-                            editor.putBoolean("next", true)
-                            editor.commit()
-                            Toast.makeText(this@MainActivity, "다음항목 이동 : 허용", Toast.LENGTH_SHORT)
-                                .show()
-                            nowPosition = -1
-                            priceOrCount = false
-                        } else {
-                            editor.putBoolean("next", false)
-                            editor.commit()
-                            Toast.makeText(this@MainActivity, "다음항목 이동 : 비허용", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-
-
-                        dialog.dismiss()
-                        this.recreate()
-                        overridePendingTransition(0, 0)
-                    }
-                    builder.show()
+                R.id.nav_setting ->{
+                    val intent = Intent(this,SettingsActivity::class.java)
+                    startActivity(intent)
+                    overridePendingTransition(0,0)
                 }
             }
             true
@@ -194,9 +164,14 @@ class MainActivity : AppCompatActivity() {
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
     }
 
+    override fun onPause() {
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
+        super.onPause()
+    }
 
     override fun onResume() {
         super.onResume()
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
 
         appUpdateManager
             .appUpdateInfo
