@@ -13,6 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CoinAverage">
         <activity
+            android:name=".ui.BaseActivity"
+            android:exported="false"
+            android:label="@string/title_activity_base"
+            android:theme="@style/Theme.CoinAverage" />
+        <activity
             android:name=".ui.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
