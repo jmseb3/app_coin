@@ -1,4 +1,8 @@
 <resources>
-    <string name="app_name">coin_composeVer</string>
+    <string name="app_name">코인 평단 계산도우미</string>
     <string name="title_activity_base">BaseActivity</string>
+
+    <string name="admob_app_id">ca-app-pub-2369897242309575~2660811376</string>
+    <string name="banner_ad_unit_id">ca-app-pub-2369897242309575/4896711024</string>
+    <string name="banner_ad_unit_id_for_test">ca-app-pub-3940256099942544/6300978111</string>
 </resources>
