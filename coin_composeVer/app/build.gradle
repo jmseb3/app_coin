@@ -60,7 +60,9 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 
-    def room_version = "2.2.6"
+    implementation "androidx.preference:preference:1.2.0"
+
+    def room_version = "2.4.2"
 
     // FOR ROOM
     implementation "androidx.room:room-runtime:$room_version"
