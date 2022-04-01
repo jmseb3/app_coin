@@ -13,23 +13,32 @@ class Config(context: Context) {
                 is Int -> putInt(key, data)
                 is Boolean -> putBoolean(key, data)
                 is String -> putString(key, data)
-                else -> {}
+                is Float -> putFloat(key, data)
+                is Long -> putLong(key, data)
             }
-            commit()
+            apply()
         }
 
     }
 
-    fun getIntConfig(key: String): Int {
+    fun getInt(key: String): Int {
         return prefs.getInt(key, 0)
     }
 
-    fun getBooleanConfig(key: String): Boolean {
+    fun getBoolean(key: String): Boolean {
         return prefs.getBoolean(key, false)
     }
 
-    fun getStringConfig(key: String): String? {
+    fun getString(key: String): String? {
         return prefs.getString(key, null)
+    }
+
+    fun getLong(key:String):Long {
+        return prefs.getLong(key,0L)
+    }
+
+    fun getFloat(key:String):Float {
+        return prefs.getFloat(key,0f)
     }
 
 }

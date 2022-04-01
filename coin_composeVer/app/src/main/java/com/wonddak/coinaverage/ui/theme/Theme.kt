@@ -12,15 +12,15 @@ import androidx.compose.ui.text.font.FontWeight
 import com.wonddak.coinaverage.R
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = MyGray,
+    primaryVariant = MyWhite,
+    secondary = MyWhite
 )
 
 private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = MyGray,
+    primaryVariant = MyWhite,
+    secondary = MyWhite
 
     /* Other default colors to override
     background = Color.White,
