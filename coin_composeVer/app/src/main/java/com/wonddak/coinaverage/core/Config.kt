@@ -21,8 +21,8 @@ class Config(context: Context) {
 
     }
 
-    fun getInt(key: String): Int {
-        return prefs.getInt(key, 0)
+    fun getInt(key: String,defaultValue:Int): Int {
+        return prefs.getInt(key, defaultValue)
     }
 
     fun getBoolean(key: String): Boolean {

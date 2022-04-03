@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,12 +13,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,7 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.room.PrimaryKey
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -36,11 +37,14 @@ import com.wonddak.coinaverage.Font
 import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.core.Config
 import com.wonddak.coinaverage.core.Const
+import com.wonddak.coinaverage.room.AppDatabase
+import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.ui.theme.MyGray
 import com.wonddak.coinaverage.ui.theme.MyWhite
-import java.lang.NumberFormatException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.text.DecimalFormat
-import kotlin.math.absoluteValue
 
 
 class MainActivity : ComponentActivity() {
@@ -106,9 +110,12 @@ fun BaseApp(
             )
         },
         drawerContent = { Text(text = "drawerContent") },
-        content = { bodyContent() },
         bottomBar = { AdvertView() }
-    )
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            bodyContent()
+        }
+    }
 }
 
 @Composable
@@ -152,67 +159,86 @@ fun PreviewMain() {
 @Composable
 fun MainView() {
     val context = LocalContext.current
-    var avg by remember { mutableStateOf(0) }
-    var total by remember { mutableStateOf(0) }
-    var count by remember { mutableStateOf(0) }
-    val format = Config(context = context).getString(Const.DECIMAL_FORMAT)
+
+    var avg by remember { mutableStateOf(0f) }
+    var total by remember { mutableStateOf(0f) }
+    var count by remember { mutableStateOf(0f) }
+
+    val mConfig = Config(context)
+    val format = mConfig.getString(Const.DECIMAL_FORMAT)
         ?: Const.DecimalFormat.TWO.value
     val dec = DecimalFormat(format)
+
+    val db = AppDatabase.getInstance(context)
+    val iddata = mConfig.getInt(Const.ID_DATA, 1)
+    val coinData by db.dbDao().getCoinDetailById(iddata).observeAsState()
 
     Column(
         modifier = Modifier
             .background(MyGray)
             .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxHeight(1f),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(20.dp, 10.dp)
-                .border(border = BorderStroke(2.dp, MyWhite))
+            modifier = Modifier.weight(7f)
         ) {
-            val lineBoxModifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(7.dp, 5.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(20.dp, 10.dp)
+                    .border(border = BorderStroke(2.dp, MyWhite))
+            ) {
+                val lineBoxModifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(7.dp, 5.dp)
+                LineInMainBox(
+                    modifier = lineBoxModifier,
+                    text1 = "평균매수 단가 :",
+                    text2 = String.format("%s 원", dec.format(avg))
+                )
+                LineInMainBox(
+                    modifier = lineBoxModifier,
+                    text1 = "총 매수 금액 : ",
+                    text2 = String.format("%s 원", dec.format(total))
+                )
+                LineInMainBox(
+                    modifier = lineBoxModifier,
+                    text1 = "총 매수 량 :",
+                    text2 = String.format("%s 원", dec.format(count))
+                )
+            }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "각 항목별 짧게눌러 초기화/길게눌러 삭제 가능합니다.",
+                color = MyWhite,
+                fontFamily = Font.maplestoryfont,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(1.dp))
 
-            LineInMainBox(
-                modifier = lineBoxModifier,
-                text1 = "평균매수 단가 :",
-                text2 = String.format("%s 원", dec.format(avg))
-            )
-            LineInMainBox(
-                modifier = lineBoxModifier,
-                text1 = "총 매수 금액 : ",
-                text2 = String.format("%s 원", dec.format(total))
-            )
-            LineInMainBox(
-                modifier = lineBoxModifier,
-                text1 = "총 매수 량 :",
-                text2 = String.format("%s 원", dec.format(count))
-            )
+
+            Log.d("datasss", "" + coinData)
+            if (coinData == null) {
+
+            } else {
+                LazyTemp(temp = coinData!!)
+            }
         }
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "각 항목별 짧게눌러 초기화/길게눌러 삭제 가능합니다.",
-            color = MyWhite,
-            fontFamily = Font.maplestoryfont,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(1.dp))
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Button(onClick = {
+                GlobalScope.launch(Dispatchers.IO) {
+                    db.dbDao().insertCoinDetailData(CoinDetail(null, iddata))
+                }
+            }) {
 
-        val temp:List<CoinDetail> = mutableListOf(
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-            CoinDetail(0,0,"",""),
-        )
-        LazyTemp(temp = temp)
-
+            }
+        }
 
 
     }
@@ -220,23 +246,17 @@ fun MainView() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LazyTemp(temp:List<CoinDetail>){
+fun LazyTemp(temp: List<CoinDetail>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         LazyColumn(
-        ){
-            itemsIndexed(temp){ index, item ->
-                InputTextItem(index = index, price = item.coinPrice, count =item.coinCount )
+        ) {
+            itemsIndexed(temp) { index, item ->
+                InputTextItem(index = index, price = item.coinPrice, count = item.coinCount, temp)
             }
         }
     }
 }
 
-data class CoinDetail(
-    @PrimaryKey(autoGenerate = true) val id: Int?,
-    val coinId: Int,
-    var coinPrice: String="",
-    var coinCount: String=""
-)
 
 @Composable
 fun LineInMainBox(modifier: Modifier, text1: String, text2: String) {
@@ -262,31 +282,53 @@ fun TextInMainBox(modifier: Modifier, text: String, textAlign: TextAlign) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun InputTextItem(index:Int, price:String, count:String) {
-    var price by remember {
-        mutableStateOf(price)
+fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDetail>) {
+    var prices by remember {
+        mutableStateOf(price.toString())
     }
-    var count by remember {
-        mutableStateOf(count)
+    var counts by remember {
+        mutableStateOf(count.toString())
     }
     var total by remember {
         mutableStateOf(0f)
     }
     val context = LocalContext.current
+    val mConfig = Config(context)
+    val format = mConfig.getString(Const.DECIMAL_FORMAT)
+        ?: Const.DecimalFormat.TWO.value
+    val dec = DecimalFormat(format)
+
+    val db = AppDatabase.getInstance(context)
+    val iddata = mConfig.getInt(Const.ID_DATA, 1)
 
     Column(
         Modifier
             .padding(10.dp, 0.dp)
             .combinedClickable(
                 onClick = {
-                    price = ""
-                    count = ""
+                    prices = ""
+                    counts = ""
                     total = 0f
                 },
                 onLongClick = {
-                    Toast
-                        .makeText(context, "삭제", Toast.LENGTH_SHORT)
-                        .show()
+                    if (coinData.size == 1) {
+                        Toast
+                            .makeText(context, "최소 하나는 존재해야합니다.", Toast.LENGTH_SHORT)
+                            .show()
+                    } else {
+                        Toast
+                            .makeText(context, "${index}번 항목을 삭제 했습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                        GlobalScope.launch(Dispatchers.IO) {
+                            val data = db
+                                .dbDao()
+                                .getCoinDetailId(iddata)
+                            db
+                                .dbDao()
+                                .deleteCoinDetailById(data[index])
+                        }
+                    }
+
                 }
             )
             .background(MyWhite),
@@ -322,14 +364,19 @@ fun InputTextItem(index:Int, price:String, count:String) {
 
                 },
                 singleLine = true,
-                value = price.toString(),
+                value = if (prices == "0") "" else prices.toString(),
                 onValueChange = {
                     try {
-                        price = when (it.toDoubleOrNull()) {
-                            null -> price
+                        Log.d("datasss", "" + it)
+                        prices = when (it.toDoubleOrNull()) {
+                            null -> prices
                             else -> it
                         }
-                        total = price.toFloat() * count.toFloat()
+                        if (it == "") {
+                            prices = ""
+                        }
+                        Log.d("datassss", "" + prices)
+                        total = prices.toFloat() * counts.toFloat()
                     } catch (e: NumberFormatException) {
 
                     }
@@ -353,28 +400,39 @@ fun InputTextItem(index:Int, price:String, count:String) {
                     )
                 },
                 modifier = modifier.padding(5.dp, 0.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions {
+
+                },
                 singleLine = true,
-                value = count,
+                value = if (counts == "0") "" else counts.toString(),
                 onValueChange = {
                     try {
-                        count = when (it.toDoubleOrNull()) {
-                            null -> count
+                        counts = when (it.toDoubleOrNull()) {
+                            null -> counts
                             else -> it
                         }
-                        total = price.toFloat() * count.toFloat()
+                        if (it == "") {
+                            counts = ""
+                        }
+                        total = prices.toFloat() * counts.toFloat()
                     } catch (e: NumberFormatException) {
 
                     }
                 },
+                textStyle = TextStyle(color = MyGray, fontFamily = Font.maplestoryfont),
                 placeholder = {
                     Text(fontSize = 10.sp, text = "매수 량을 입력해주세요")
                 },
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MyGray,
                     unfocusedLabelColor = MyGray
-                )
+                ),
             )
+
         }
         Spacer(modifier = Modifier.height(5.dp))
         Row(
@@ -386,7 +444,7 @@ fun InputTextItem(index:Int, price:String, count:String) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "#${index+1}",
+                text = "#${index + 1}",
                 modifier = Modifier.weight(1f),
                 fontFamily = Font.maplestoryfont,
                 color = MyGray
