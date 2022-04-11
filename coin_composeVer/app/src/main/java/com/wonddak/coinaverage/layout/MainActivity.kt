@@ -16,20 +16,23 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -44,6 +47,7 @@ import com.wonddak.coinaverage.ui.theme.MyWhite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import java.text.DecimalFormat
 
 
@@ -101,7 +105,7 @@ fun BaseApp(
                     Text(
                         text = title,
                         color = MyGray,
-                        fontFamily = Font.maplestoryfont,
+                        fontFamily = Font.mapleStory,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -171,7 +175,7 @@ fun MainView() {
 
     val db = AppDatabase.getInstance(context)
     val iddata = mConfig.getInt(Const.ID_DATA, 1)
-    val coinData by db.dbDao().getCoinDetailById(iddata).observeAsState()
+    val coinData by db.dbDao().getCoinDetailById(iddata).observeAsState(listOf())
 
     Column(
         modifier = Modifier
@@ -214,17 +218,27 @@ fun MainView() {
                 modifier = Modifier.fillMaxWidth(),
                 text = "각 항목별 짧게눌러 초기화/길게눌러 삭제 가능합니다.",
                 color = MyWhite,
-                fontFamily = Font.maplestoryfont,
+                fontFamily = Font.mapleStory,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(1.dp))
 
 
             Log.d("datasss", "" + coinData)
-            if (coinData == null) {
-
-            } else {
-                LazyTemp(temp = coinData!!)
+            val focusManger = List(10) { FocusRequester() }
+            LazyColumn(
+            ) {
+                itemsIndexed(coinData) { index, item ->
+                    Log.d("datasss","${item.coinPrice} / ${item.coinCount}")
+                    InputTextItem(
+                        index = index,
+                        price = item.coinPrice,
+                        count = item.coinCount,
+                        imeAction = if(index == coinData.lastIndex) ImeAction.Done else ImeAction.Next,
+                        coinData=coinData,
+                        focusManger = focusManger
+                    )
+                }
             }
         }
         Row(
@@ -244,20 +258,6 @@ fun MainView() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun LazyTemp(temp: List<CoinDetail>) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        LazyColumn(
-        ) {
-            itemsIndexed(temp) { index, item ->
-                InputTextItem(index = index, price = item.coinPrice, count = item.coinCount, temp)
-            }
-        }
-    }
-}
-
-
 @Composable
 fun LineInMainBox(modifier: Modifier, text1: String, text2: String) {
     Row(
@@ -276,18 +276,25 @@ fun TextInMainBox(modifier: Modifier, text: String, textAlign: TextAlign) {
         text = text,
         color = MyWhite,
         textAlign = textAlign,
-        fontFamily = Font.maplestoryfont
+        fontFamily = Font.mapleStory
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
-fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDetail>) {
+fun InputTextItem(
+    index: Int,
+    price: Float,
+    count: Float,
+    imeAction: ImeAction = ImeAction.Next,
+    coinData: List<CoinDetail>,
+    focusManger: List<FocusRequester>
+) {
     var prices by remember {
-        mutableStateOf(price.toString())
+        mutableStateOf(TextFieldValue(price.toString()))
     }
     var counts by remember {
-        mutableStateOf(count.toString())
+        mutableStateOf(TextFieldValue(count.toString()))
     }
     var total by remember {
         mutableStateOf(0f)
@@ -306,8 +313,8 @@ fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDet
             .padding(10.dp, 0.dp)
             .combinedClickable(
                 onClick = {
-                    prices = ""
-                    counts = ""
+                    prices = TextFieldValue("")
+                    counts = TextFieldValue("")
                     total = 0f
                 },
                 onLongClick = {
@@ -333,7 +340,8 @@ fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDet
             )
             .background(MyWhite),
     ) {
-
+        val focusRequest = FocusRequester()
+        val keyboardController = LocalSoftwareKeyboardController.current
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -350,38 +358,47 @@ fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDet
                 label = {
                     Text(
                         text = "매수 가",
-                        fontFamily = Font.maplestoryfont,
+                        fontFamily = Font.mapleStory,
                         color = MyGray,
                         textAlign = TextAlign.Center
                     )
                 },
-                modifier = modifier.padding(5.dp, 0.dp),
+                modifier = modifier
+                    .padding(5.dp, 0.dp)
+                    .focusRequester(focusManger[index])
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            prices = prices.copy(
+                                selection = TextRange(start = 0,prices.text.length)
+                            )
+                        }
+                    },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
                 ),
-                keyboardActions = KeyboardActions {
-
-                },
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusRequest.requestFocus()
+                    }
+                ),
                 singleLine = true,
-                value = if (prices == "0") "" else prices.toString(),
+                value = prices,
                 onValueChange = {
                     try {
-                        Log.d("datasss", "" + it)
-                        prices = when (it.toDoubleOrNull()) {
+                        prices = when (it.text.toDoubleOrNull()) {
                             null -> prices
                             else -> it
                         }
-                        if (it == "") {
-                            prices = ""
+                        if (it.text == "") {
+                            prices = it
                         }
-                        Log.d("datassss", "" + prices)
-                        total = prices.toFloat() * counts.toFloat()
+                        total = prices.text.toFloat() * counts.text.toFloat()
                     } catch (e: NumberFormatException) {
 
                     }
                 },
-                textStyle = TextStyle(color = MyGray, fontFamily = Font.maplestoryfont),
+                textStyle = TextStyle(color = MyGray, fontFamily = Font.mapleStory),
                 placeholder = {
                     Text(fontSize = 10.sp, text = "매수 가격을 입력해주세요")
                 },
@@ -394,36 +411,50 @@ fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDet
                 label = {
                     Text(
                         text = "매수 량",
-                        fontFamily = Font.maplestoryfont,
+                        fontFamily = Font.mapleStory,
                         color = MyGray,
                         textAlign = TextAlign.Center
                     )
                 },
-                modifier = modifier.padding(5.dp, 0.dp),
+                modifier = modifier
+                    .padding(5.dp, 0.dp)
+                    .focusRequester(focusRequester = focusRequest)
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            counts =counts.copy(
+                                selection = TextRange(start = 0,counts.text.length)
+                            )
+                        }
+                    },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next
+                    imeAction = imeAction
                 ),
-                keyboardActions = KeyboardActions {
-
-                },
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManger[index + 1].requestFocus()
+                    },
+                    onDone = {
+                        keyboardController?.hide()
+                    }
+                ),
                 singleLine = true,
-                value = if (counts == "0") "" else counts.toString(),
+                value = counts,
                 onValueChange = {
                     try {
-                        counts = when (it.toDoubleOrNull()) {
+                        counts = when (it.text.toDoubleOrNull()) {
                             null -> counts
                             else -> it
                         }
-                        if (it == "") {
-                            counts = ""
+                        if (it.text == "") {
+                            counts = it
                         }
-                        total = prices.toFloat() * counts.toFloat()
+                        total = prices.text.toFloat() * counts.text.toFloat()
                     } catch (e: NumberFormatException) {
 
                     }
                 },
-                textStyle = TextStyle(color = MyGray, fontFamily = Font.maplestoryfont),
+                textStyle = TextStyle(color = MyGray, fontFamily = Font.mapleStory),
                 placeholder = {
                     Text(fontSize = 10.sp, text = "매수 량을 입력해주세요")
                 },
@@ -446,20 +477,20 @@ fun InputTextItem(index: Int, price: Float, count: Float, coinData: List<CoinDet
             Text(
                 text = "#${index + 1}",
                 modifier = Modifier.weight(1f),
-                fontFamily = Font.maplestoryfont,
+                fontFamily = Font.mapleStory,
                 color = MyGray
             )
             Text(
                 text = "총 가격",
                 modifier = Modifier.weight(1f),
-                fontFamily = Font.maplestoryfont,
+                fontFamily = Font.mapleStory,
                 color = MyGray
             )
             Text(
                 textAlign = TextAlign.Right,
                 text = "${total}원",
                 modifier = Modifier.weight(2f),
-                fontFamily = Font.maplestoryfont,
+                fontFamily = Font.mapleStory,
                 color = MyGray
             )
 

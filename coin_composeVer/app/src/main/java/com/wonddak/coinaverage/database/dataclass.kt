@@ -37,3 +37,13 @@ data class CoinInfoAndCoinDetail(
 
     val coinDetailList: List<CoinDetail>
 )
+
+@Entity
+data class MarketList(
+    @PrimaryKey(autoGenerate = true) var coinId: Int?,
+    var coinNameKorean: String,
+    var coinNameEnglish: String,
+    var isKRW: Boolean = false,
+    var isUSD: Boolean = false,
+    val isBTC: Boolean = false
+)

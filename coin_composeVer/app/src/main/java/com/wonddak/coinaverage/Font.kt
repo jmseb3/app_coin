@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 
 object Font {
-    val maplestoryfont = FontFamily(
+    val mapleStory = FontFamily(
         Font(R.font.maplestory, FontWeight.Bold, FontStyle.Normal)
     )
 }
