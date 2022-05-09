@@ -40,41 +40,46 @@ import com.wonddak.coinaverage.Font
 import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.core.Config
 import com.wonddak.coinaverage.core.Const
+import com.wonddak.coinaverage.model.CoinViewModel
+import com.wonddak.coinaverage.repository.CoinRepository
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.ui.theme.MyGray
 import com.wonddak.coinaverage.ui.theme.MyWhite
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
 import java.text.DecimalFormat
 
 
 class MainActivity : ComponentActivity() {
     var mInterstitialAd: InterstitialAd? = null
+    private val mViewModel:CoinViewModel by lazy{ CoinViewModel(
+        repository = CoinRepository(applicationContext)
+    )}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         loadAD()
+        CoroutineScope(Dispatchers.IO).launch{
+            mViewModel.getCoinData()
+            Log.d("datasss",""+mViewModel.coinDataList.value)
+        }
         setContent {
-            var title = remember { mutableStateOf(getString(R.string.app_name)) }
-
-            BaseApp(title = title.value, bodyContent = {
-                MainView()
+            BaseApp(viewModel = mViewModel, bodyContent = {
+                MainView(viewModel = mViewModel)
             })
         }
         MobileAds.initialize(this) { }
 
     }
 
-
     private fun loadAD() {
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
             this,
-            getString(R.string.banner_ad_unit_id_for_test),
+            getString(R.string.banner_ad_unit_id),
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(p0: LoadAdError) {
@@ -93,17 +98,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun BaseApp(
-    title: String = "",
+    viewModel: CoinViewModel,
     bodyContent: @Composable () -> Unit
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+    viewModel.updateTitle()
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = title,
+                        text = viewModel.getTitles(),
                         color = MyGray,
                         fontFamily = Font.mapleStory,
                         textAlign = TextAlign.Center,
@@ -154,28 +160,19 @@ fun AdvertView(modifier: Modifier = Modifier) {
 }
 
 
-@Preview
-@Composable
-fun PreviewMain() {
-    MainView()
-}
 
 @Composable
-fun MainView() {
+fun MainView(
+    viewModel: CoinViewModel
+) {
     val context = LocalContext.current
-
-    var avg by remember { mutableStateOf(0f) }
-    var total by remember { mutableStateOf(0f) }
-    var count by remember { mutableStateOf(0f) }
 
     val mConfig = Config(context)
     val format = mConfig.getString(Const.DECIMAL_FORMAT)
         ?: Const.DecimalFormat.TWO.value
     val dec = DecimalFormat(format)
 
-    val db = AppDatabase.getInstance(context)
-    val iddata = mConfig.getInt(Const.ID_DATA, 1)
-    val coinData by db.dbDao().getCoinDetailById(iddata).observeAsState(listOf())
+    val coinData = viewModel.coinDataList.observeAsState()
 
     Column(
         modifier = Modifier
@@ -201,17 +198,17 @@ fun MainView() {
                 LineInMainBox(
                     modifier = lineBoxModifier,
                     text1 = "평균매수 단가 :",
-                    text2 = String.format("%s 원", dec.format(avg))
+                    text2 = String.format("%s 원", dec.format(viewModel.avg))
                 )
                 LineInMainBox(
                     modifier = lineBoxModifier,
                     text1 = "총 매수 금액 : ",
-                    text2 = String.format("%s 원", dec.format(total))
+                    text2 = String.format("%s 원", dec.format(viewModel.total))
                 )
                 LineInMainBox(
                     modifier = lineBoxModifier,
                     text1 = "총 매수 량 :",
-                    text2 = String.format("%s 원", dec.format(count))
+                    text2 = String.format("%s 원", dec.format(viewModel.count))
                 )
             }
             Text(
@@ -224,20 +221,20 @@ fun MainView() {
             Spacer(modifier = Modifier.height(1.dp))
 
 
-            Log.d("datasss", "" + coinData)
             val focusManger = List(10) { FocusRequester() }
             LazyColumn(
             ) {
-                itemsIndexed(coinData) { index, item ->
-                    Log.d("datasss","${item.coinPrice} / ${item.coinCount}")
-                    InputTextItem(
-                        index = index,
-                        price = item.coinPrice,
-                        count = item.coinCount,
-                        imeAction = if(index == coinData.lastIndex) ImeAction.Done else ImeAction.Next,
-                        coinData=coinData,
-                        focusManger = focusManger
-                    )
+                coinData.value?.let {
+                    itemsIndexed(it) { index, item ->
+                        InputTextItem(
+                            index = index,
+                            price = item.coinPrice,
+                            count = item.coinCount,
+                            imeAction = if(index == it.lastIndex) ImeAction.Done else ImeAction.Next,
+                            coinData=it,
+                            focusManger = focusManger
+                        )
+                    }
                 }
             }
         }
@@ -247,7 +244,7 @@ fun MainView() {
         ) {
             Button(onClick = {
                 GlobalScope.launch(Dispatchers.IO) {
-                    db.dbDao().insertCoinDetailData(CoinDetail(null, iddata))
+                    viewModel.addNewCoinInfo()
                 }
             }) {
 
@@ -369,7 +366,7 @@ fun InputTextItem(
                     .onFocusChanged {
                         if (it.isFocused) {
                             prices = prices.copy(
-                                selection = TextRange(start = 0,prices.text.length)
+                                selection = TextRange(start = 0, prices.text.length)
                             )
                         }
                     },
@@ -421,8 +418,8 @@ fun InputTextItem(
                     .focusRequester(focusRequester = focusRequest)
                     .onFocusChanged {
                         if (it.isFocused) {
-                            counts =counts.copy(
-                                selection = TextRange(start = 0,counts.text.length)
+                            counts = counts.copy(
+                                selection = TextRange(start = 0, counts.text.length)
                             )
                         }
                     },
