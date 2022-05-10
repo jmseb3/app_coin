@@ -173,6 +173,9 @@ fun MainView(
     val dec = DecimalFormat(format)
 
     val coinData = viewModel.coinDataList.observeAsState()
+    val avg = viewModel.avg.observeAsState()
+    val total = viewModel.total.observeAsState()
+    val count = viewModel.count.observeAsState()
 
     Column(
         modifier = Modifier
@@ -195,21 +198,27 @@ fun MainView(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(7.dp, 5.dp)
-                LineInMainBox(
-                    modifier = lineBoxModifier,
-                    text1 = "평균매수 단가 :",
-                    text2 = String.format("%s 원", dec.format(viewModel.avg))
-                )
-                LineInMainBox(
-                    modifier = lineBoxModifier,
-                    text1 = "총 매수 금액 : ",
-                    text2 = String.format("%s 원", dec.format(viewModel.total))
-                )
-                LineInMainBox(
-                    modifier = lineBoxModifier,
-                    text1 = "총 매수 량 :",
-                    text2 = String.format("%s 원", dec.format(viewModel.count))
-                )
+                avg.value?.let {
+                    LineInMainBox(
+                        modifier = lineBoxModifier,
+                        text1 = "평균매수 단가 :",
+                        text2 = String.format("%s 원", dec.format(it))
+                    )
+                }
+                total.value?.let {
+                    LineInMainBox(
+                        modifier = lineBoxModifier,
+                        text1 = "총 매수 금액 : ",
+                        text2 = String.format("%s 원", dec.format(it))
+                    )
+                }
+                count.value?.let {
+                    LineInMainBox(
+                        modifier = lineBoxModifier,
+                        text1 = "총 매수 량 :",
+                        text2 = String.format("%s 원", dec.format(it))
+                    )
+                }
             }
             Text(
                 modifier = Modifier.fillMaxWidth(),
@@ -232,7 +241,8 @@ fun MainView(
                             count = item.coinCount,
                             imeAction = if(index == it.lastIndex) ImeAction.Done else ImeAction.Next,
                             coinData=it,
-                            focusManger = focusManger
+                            focusManger = focusManger,
+                            viewModel = viewModel
                         )
                     }
                 }
@@ -243,6 +253,11 @@ fun MainView(
             verticalAlignment = Alignment.Bottom
         ) {
             Button(onClick = {
+                coinData.value?.let {
+                    it.forEach {
+                        Log.d("datasss",""+it)
+                    }
+                }
                 GlobalScope.launch(Dispatchers.IO) {
                     viewModel.addNewCoinInfo()
                 }
@@ -285,7 +300,8 @@ fun InputTextItem(
     count: Float,
     imeAction: ImeAction = ImeAction.Next,
     coinData: List<CoinDetail>,
-    focusManger: List<FocusRequester>
+    focusManger: List<FocusRequester>,
+    viewModel: CoinViewModel
 ) {
     var prices by remember {
         mutableStateOf(TextFieldValue(price.toString()))
@@ -377,6 +393,11 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusRequest.requestFocus()
+                        CoroutineScope(Dispatchers.IO).launch{
+                            Log.d("datasss",""+coinData[index].id!!)
+                            Log.d("datasss",""+prices.text.toFloat())
+                            viewModel.updateCoinDetailPrice(coinData[index].id!!,prices.text.toFloat())
+                        }
                     }
                 ),
                 singleLine = true,
@@ -430,8 +451,18 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusManger[index + 1].requestFocus()
+                        CoroutineScope(Dispatchers.IO).launch{
+                            Log.d("datasss",""+coinData[index].id!!)
+                            Log.d("datasss",""+counts.text.toFloat())
+                            viewModel.updateCoinDetailCount(coinData[index].id!!,counts.text.toFloat())
+                        }
                     },
                     onDone = {
+                        CoroutineScope(Dispatchers.IO).launch{
+                            Log.d("datasss",""+coinData[index].id!!)
+                            Log.d("datasss",""+counts.text.toFloat())
+                            viewModel.updateCoinDetailCount(coinData[index].id!!,counts.text.toFloat())
+                        }
                         keyboardController?.hide()
                     }
                 ),

@@ -12,9 +12,14 @@ import com.wonddak.coinaverage.room.CoinDetail
 class CoinViewModel(
     private val repository: CoinRepository
 ) :ViewModel() {
-    var avg by mutableStateOf(0f)
-    var total by mutableStateOf(0f)
-    var count by mutableStateOf(0f)
+
+    private val _avg:MutableLiveData<Float> = MutableLiveData(0f)
+    private val _total:MutableLiveData<Float> = MutableLiveData(0f)
+    private val _count:MutableLiveData<Float> = MutableLiveData(0f)
+
+    var avg:LiveData<Float> = _avg
+    var total :LiveData<Float> = _total
+    var count :LiveData<Float> = _count
 
     private var title by  mutableStateOf("")
 
@@ -26,11 +31,33 @@ class CoinViewModel(
         repository.getCoinData().let {
             _coinDataList.postValue(it)
         }
+        updateInfo()
     }
 
     fun addNewCoinInfo(){
         repository.addNewCoinInfo()
         getCoinData()
+    }
+
+    private fun updateInfo(){
+        var tSum = 0.0f
+        var tCount = 0.0f
+        var tAvg =0.0f
+        coinDataList.value?.forEach {
+            tSum += (it.coinPrice*it.coinCount)
+            tCount +=it.coinCount
+        }
+
+        if (tCount != 0.0f) {
+            tAvg = tSum / tCount
+            _count.postValue(tCount)
+            _total.postValue(tSum)
+            _avg.postValue(tAvg)
+        }else{
+            _count.postValue(0.0f)
+            _total.postValue(tSum)
+            _avg.postValue(0.0f)
+        }
     }
 
     fun updateTitle(){
@@ -39,6 +66,13 @@ class CoinViewModel(
 
     fun getTitles():String{
         return title
+    }
+    fun updateCoinDetailCount(id: Int, count: Float) {
+        repository.updateCoinDetailCount(id, count)
+    }
+
+    fun updateCoinDetailPrice(id: Int, price: Float) {
+        repository.updateCoinDetailPrice(id, price)
     }
 }
 

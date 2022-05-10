@@ -9,8 +9,9 @@ import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.room.dbDao
 import java.text.DecimalFormat
+import java.text.FieldPosition
 
-class CoinRepository(val mContext:Context) {
+class CoinRepository(private val mContext:Context) {
     private val mConfig = Config(mContext)
     private val format = mConfig.getString(Const.DECIMAL_FORMAT) ?: Const.DecimalFormat.TWO.value
     val dec = DecimalFormat(format)
@@ -30,5 +31,12 @@ class CoinRepository(val mContext:Context) {
 
     fun addNewCoinInfo(){
         db.dbDao().insertCoinDetailData(CoinDetail(null,idData))
+    }
+
+    fun updateCoinDetailCount(position:Int,newCount:Float){
+        db.dbDao().updateCoinDetailByCoinitemIdCount(position,newCount)
+    }
+    fun updateCoinDetailPrice(position:Int,newPrice:Float){
+        db.dbDao().updateCoinDetailByCoinitemIdPrice(position,newPrice)
     }
 }
