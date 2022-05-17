@@ -21,6 +21,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -50,22 +51,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import java.text.DecimalFormat
 
 
 class MainActivity : ComponentActivity() {
     var mInterstitialAd: InterstitialAd? = null
-    private val mViewModel:CoinViewModel by lazy{ CoinViewModel(
-        repository = CoinRepository(applicationContext)
-    )}
+    private val mViewModel: CoinViewModel by lazy {
+        CoinViewModel(
+            repository = CoinRepository(applicationContext)
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadAD()
-        CoroutineScope(Dispatchers.IO).launch{
-            mViewModel.getCoinData()
-            Log.d("datasss",""+mViewModel.coinDataList.value)
-        }
+        mViewModel.getCoinData()
+        Log.d("datasss", "" + mViewModel.coinDataList.value)
         setContent {
             BaseApp(viewModel = mViewModel, bodyContent = {
                 MainView(viewModel = mViewModel)
@@ -160,7 +162,6 @@ fun AdvertView(modifier: Modifier = Modifier) {
 }
 
 
-
 @Composable
 fun MainView(
     viewModel: CoinViewModel
@@ -172,6 +173,7 @@ fun MainView(
         ?: Const.DecimalFormat.TWO.value
     val dec = DecimalFormat(format)
 
+    viewModel.updateInfo()
     val coinData = viewModel.coinDataList.observeAsState()
     val avg = viewModel.avg.observeAsState()
     val total = viewModel.total.observeAsState()
@@ -199,6 +201,7 @@ fun MainView(
                     .wrapContentHeight()
                     .padding(7.dp, 5.dp)
                 avg.value?.let {
+                    Log.d("datasss","avg : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "평균매수 단가 :",
@@ -206,6 +209,7 @@ fun MainView(
                     )
                 }
                 total.value?.let {
+                    Log.d("datasss","total : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "총 매수 금액 : ",
@@ -213,6 +217,7 @@ fun MainView(
                     )
                 }
                 count.value?.let {
+                    Log.d("datasss","count : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "총 매수 량 :",
@@ -239,8 +244,8 @@ fun MainView(
                             index = index,
                             price = item.coinPrice,
                             count = item.coinCount,
-                            imeAction = if(index == it.lastIndex) ImeAction.Done else ImeAction.Next,
-                            coinData=it,
+                            imeAction = if (index == it.lastIndex) ImeAction.Done else ImeAction.Next,
+                            coinData = it,
                             focusManger = focusManger,
                             viewModel = viewModel
                         )
@@ -248,26 +253,28 @@ fun MainView(
                 }
             }
         }
-        Row(
-            modifier = Modifier.weight(1f),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            Button(onClick = {
-                coinData.value?.let {
-                    it.forEach {
-                        Log.d("datasss",""+it)
-                    }
-                }
-                GlobalScope.launch(Dispatchers.IO) {
-                    viewModel.addNewCoinInfo()
-                }
-            }) {
-
-            }
-        }
-
-
+        val bottomModifier  = Modifier.weight(1f)
+        BottomBox(viewModel = viewModel, modifier = bottomModifier)
     }
+}
+
+@Composable
+fun BottomBox(viewModel: CoinViewModel,modifier: Modifier){
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ){
+        val modifier = Modifier.weight(1f).fillMaxHeight(0.6f)
+        OutlinedButton(modifier = modifier,onClick = { viewModel.addNewCoinInfo() }) {
+            Text(text = "추가")
+
+        }
+        OutlinedButton(modifier = modifier,onClick = {  }) {
+            Text(text = "전체 초기화")
+
+        }
+    }
+
 }
 
 @Composable
@@ -313,13 +320,7 @@ fun InputTextItem(
         mutableStateOf(0f)
     }
     val context = LocalContext.current
-    val mConfig = Config(context)
-    val format = mConfig.getString(Const.DECIMAL_FORMAT)
-        ?: Const.DecimalFormat.TWO.value
-    val dec = DecimalFormat(format)
-
-    val db = AppDatabase.getInstance(context)
-    val iddata = mConfig.getInt(Const.ID_DATA, 1)
+    val nowFocus = LocalFocusManager.current
 
     Column(
         Modifier
@@ -339,14 +340,7 @@ fun InputTextItem(
                         Toast
                             .makeText(context, "${index}번 항목을 삭제 했습니다.", Toast.LENGTH_SHORT)
                             .show()
-                        GlobalScope.launch(Dispatchers.IO) {
-                            val data = db
-                                .dbDao()
-                                .getCoinDetailId(iddata)
-                            db
-                                .dbDao()
-                                .deleteCoinDetailById(data[index])
-                        }
+                        viewModel.deleteSelectItem(coinData[index].id!!)
                     }
 
                 }
@@ -393,10 +387,13 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusRequest.requestFocus()
-                        CoroutineScope(Dispatchers.IO).launch{
-                            Log.d("datasss",""+coinData[index].id!!)
-                            Log.d("datasss",""+prices.text.toFloat())
-                            viewModel.updateCoinDetailPrice(coinData[index].id!!,prices.text.toFloat())
+                        try{
+                        viewModel.updateCoinDetailPrice(
+                            coinData[index].id!!,
+                            prices.text.toFloat()
+                        )}
+                        catch (e:Exception){
+
                         }
                     }
                 ),
@@ -451,19 +448,21 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusManger[index + 1].requestFocus()
-                        CoroutineScope(Dispatchers.IO).launch{
-                            Log.d("datasss",""+coinData[index].id!!)
-                            Log.d("datasss",""+counts.text.toFloat())
-                            viewModel.updateCoinDetailCount(coinData[index].id!!,counts.text.toFloat())
+                        try{
+                        viewModel.updateCoinDetailCount(coinData[index].id!!, counts.text.toFloat())}
+                        catch (e:Exception){
+
                         }
+
                     },
                     onDone = {
-                        CoroutineScope(Dispatchers.IO).launch{
-                            Log.d("datasss",""+coinData[index].id!!)
-                            Log.d("datasss",""+counts.text.toFloat())
-                            viewModel.updateCoinDetailCount(coinData[index].id!!,counts.text.toFloat())
+                        try{
+                            viewModel.updateCoinDetailCount(coinData[index].id!!, counts.text.toFloat())
+                        } catch (e:Exception){
+
                         }
                         keyboardController?.hide()
+                        nowFocus.clearFocus()
                     }
                 ),
                 singleLine = true,

@@ -36,7 +36,12 @@ class CoinRepository(private val mContext:Context) {
     fun updateCoinDetailCount(position:Int,newCount:Float){
         db.dbDao().updateCoinDetailByCoinitemIdCount(position,newCount)
     }
+
     fun updateCoinDetailPrice(position:Int,newPrice:Float){
         db.dbDao().updateCoinDetailByCoinitemIdPrice(position,newPrice)
+    }
+
+    fun deleteCoinDetailById(id:Int){
+        db.dbDao().deleteCoinDetailById(id)
     }
 }
