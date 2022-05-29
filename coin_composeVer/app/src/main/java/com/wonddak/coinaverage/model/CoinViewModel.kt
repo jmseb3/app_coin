@@ -13,6 +13,7 @@ import com.wonddak.coinaverage.room.CoinDetail
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
 class CoinViewModel(
@@ -33,27 +34,37 @@ class CoinViewModel(
 
     private val _coinDataList: MutableLiveData<List<CoinDetail>> = MutableLiveData()
 
-    val coinDataList: LiveData<List<CoinDetail>> = _coinDataList
+    val coinDataList: LiveData<List<CoinDetail>>
+        get() = _coinDataList
+
 
     fun getCoinData() {
         viewModelScope.launch(bgDispatcher) {
-            repository.getCoinData().let {
-                _coinDataList.postValue(it)
+            withContext(bgDispatcher) {
+                withContext(bgDispatcher) {
+                    repository.getCoinData().let {
+                        it.sortedBy { it.id }
+                        _coinDataList.postValue(it)
+                    }
+                }
             }
-            updateInfo()
         }
     }
 
     fun addNewCoinInfo() {
         viewModelScope.launch(bgDispatcher) {
-            repository.addNewCoinInfo()
-            getCoinData()
+            withContext(bgDispatcher) {
+                repository.addNewCoinInfo()
+            }
+           updateInfo()
         }
     }
 
     fun updateInfo() {
         viewModelScope.launch(bgDispatcher) {
-            getCoinData()
+            withContext(bgDispatcher) {
+                getCoinData()
+            }
             var tSum = 0.0f
             var tCount = 0.0f
             var tAvg = 0.0f
@@ -97,9 +108,18 @@ class CoinViewModel(
         }
     }
 
-    fun deleteSelectItem(id:Int){
+    fun deleteSelectItem(id: Int) {
         viewModelScope.launch(bgDispatcher) {
             repository.deleteCoinDetailById(id)
+            updateInfo()
+        }
+    }
+
+    fun clearCoinInfo() {
+        viewModelScope.launch(bgDispatcher) {
+            repository.clearCoinDetail()
+            repository.addNewCoinInfo()
+            repository.addNewCoinInfo()
             updateInfo()
         }
     }

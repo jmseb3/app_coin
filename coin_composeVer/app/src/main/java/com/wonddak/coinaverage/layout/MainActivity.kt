@@ -2,6 +2,7 @@ package com.wonddak.coinaverage.layout
 
 import android.os.Bundle
 import android.util.Log
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -30,7 +32,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -43,14 +44,9 @@ import com.wonddak.coinaverage.core.Config
 import com.wonddak.coinaverage.core.Const
 import com.wonddak.coinaverage.model.CoinViewModel
 import com.wonddak.coinaverage.repository.CoinRepository
-import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.ui.theme.MyGray
 import com.wonddak.coinaverage.ui.theme.MyWhite
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.lang.Exception
 import java.text.DecimalFormat
 
@@ -66,8 +62,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         loadAD()
-        mViewModel.getCoinData()
-        Log.d("datasss", "" + mViewModel.coinDataList.value)
         setContent {
             BaseApp(viewModel = mViewModel, bodyContent = {
                 MainView(viewModel = mViewModel)
@@ -174,7 +168,7 @@ fun MainView(
     val dec = DecimalFormat(format)
 
     viewModel.updateInfo()
-    val coinData = viewModel.coinDataList.observeAsState()
+    val coinData = viewModel.coinDataList.observeAsState().value
     val avg = viewModel.avg.observeAsState()
     val total = viewModel.total.observeAsState()
     val count = viewModel.count.observeAsState()
@@ -183,7 +177,7 @@ fun MainView(
         modifier = Modifier
             .background(MyGray)
             .fillMaxWidth()
-            .fillMaxHeight(1f),
+            .fillMaxHeight(),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
@@ -201,7 +195,6 @@ fun MainView(
                     .wrapContentHeight()
                     .padding(7.dp, 5.dp)
                 avg.value?.let {
-                    Log.d("datasss","avg : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "평균매수 단가 :",
@@ -209,7 +202,6 @@ fun MainView(
                     )
                 }
                 total.value?.let {
-                    Log.d("datasss","total : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "총 매수 금액 : ",
@@ -217,7 +209,6 @@ fun MainView(
                     )
                 }
                 count.value?.let {
-                    Log.d("datasss","count : $it")
                     LineInMainBox(
                         modifier = lineBoxModifier,
                         text1 = "총 매수 량 :",
@@ -232,14 +223,16 @@ fun MainView(
                 fontFamily = Font.mapleStory,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(1.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-
-            val focusManger = List(10) { FocusRequester() }
+            val focusManger = List(coinData?.size ?:0) { FocusRequester() }
             LazyColumn(
+                modifier = Modifier.weight(1f)
             ) {
-                coinData.value?.let {
+                coinData?.let {
+                    Log.d("JWH","s-------------------------------------")
                     itemsIndexed(it) { index, item ->
+                        Log.d("JWH","$index - ${item.coinPrice} / ${item.coinCount}")
                         InputTextItem(
                             index = index,
                             price = item.coinPrice,
@@ -249,28 +242,45 @@ fun MainView(
                             focusManger = focusManger,
                             viewModel = viewModel
                         )
+                        Divider(color = MyGray)
                     }
+                    Log.d("JWH","e-------------------------------------")
                 }
             }
+            Spacer(modifier = Modifier.height(10.dp))
+            BottomBox(viewModel = viewModel, modifier =  Modifier.height(56.dp) ,focusManger = focusManger,)
         }
-        val bottomModifier  = Modifier.weight(1f)
-        BottomBox(viewModel = viewModel, modifier = bottomModifier)
+
     }
 }
 
 @Composable
-fun BottomBox(viewModel: CoinViewModel,modifier: Modifier){
+fun BottomBox(viewModel: CoinViewModel, modifier: Modifier,focusManger: List<FocusRequester>) {
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(10.dp,0.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
-        val modifier = Modifier.weight(1f).fillMaxHeight(0.6f)
-        OutlinedButton(modifier = modifier,onClick = { viewModel.addNewCoinInfo() }) {
-            Text(text = "추가")
+        val modifier = Modifier
+            .weight(2f)
+            .fillMaxHeight()
+            .background(MyGray)
+            .border(width = 2.dp, color = MyWhite, shape = RoundedCornerShape(5.dp))
+        OutlinedButton(
+            modifier = modifier,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+            onClick = { viewModel.addNewCoinInfo() }) {
+            Text(text = "추가", modifier = Modifier.background(MyGray), color = MyWhite)
 
         }
-        OutlinedButton(modifier = modifier,onClick = {  }) {
-            Text(text = "전체 초기화")
+        Spacer(modifier = Modifier.width(10.dp))
+        OutlinedButton(
+            modifier = modifier,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+            onClick = {
+                viewModel.clearCoinInfo()
+                focusManger[0].requestFocus()
+            }) {
+            Text(text = "전체 초기화", modifier = Modifier.background(MyGray), color = MyWhite)
 
         }
     }
@@ -283,8 +293,20 @@ fun LineInMainBox(modifier: Modifier, text1: String, text2: String) {
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TextInMainBox(modifier = Modifier.weight(1f), text = text1, textAlign = TextAlign.Left)
-        TextInMainBox(modifier = Modifier.weight(1f), text = text2, textAlign = TextAlign.Right)
+        Text(
+            modifier = Modifier.weight(1f),
+            text = text1,
+            color = MyWhite,
+            textAlign = TextAlign.Left,
+            fontFamily = Font.mapleStory
+        )
+        Text(
+            modifier = Modifier.weight(1f),
+            text = text2,
+            color = MyWhite,
+            textAlign = TextAlign.Right,
+            fontFamily = Font.mapleStory
+        )
     }
 }
 
@@ -298,6 +320,7 @@ fun TextInMainBox(modifier: Modifier, text: String, textAlign: TextAlign) {
         fontFamily = Font.mapleStory
     )
 }
+
 
 @OptIn(ExperimentalFoundationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
 @Composable
@@ -327,9 +350,12 @@ fun InputTextItem(
             .padding(10.dp, 0.dp)
             .combinedClickable(
                 onClick = {
-                    prices = TextFieldValue("")
-                    counts = TextFieldValue("")
+                    prices = TextFieldValue("0.0")
+                    counts = TextFieldValue("0.0")
                     total = 0f
+                    viewModel.updateCoinDetailCount(coinData[index].id!!,0.0f)
+                    viewModel.updateCoinDetailPrice(coinData[index].id!!,0.0f)
+                    focusManger[index].requestFocus()
                 },
                 onLongClick = {
                     if (coinData.size == 1) {
@@ -338,11 +364,10 @@ fun InputTextItem(
                             .show()
                     } else {
                         Toast
-                            .makeText(context, "${index}번 항목을 삭제 했습니다.", Toast.LENGTH_SHORT)
+                            .makeText(context, "${index+1}번 항목을 삭제 했습니다.", Toast.LENGTH_SHORT)
                             .show()
                         viewModel.deleteSelectItem(coinData[index].id!!)
                     }
-
                 }
             )
             .background(MyWhite),
@@ -387,12 +412,12 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusRequest.requestFocus()
-                        try{
-                        viewModel.updateCoinDetailPrice(
-                            coinData[index].id!!,
-                            prices.text.toFloat()
-                        )}
-                        catch (e:Exception){
+                        try {
+                            viewModel.updateCoinDetailPrice(
+                                coinData[index].id!!,
+                                prices.text.toFloat()
+                            )
+                        } catch (e: Exception) {
 
                         }
                     }
@@ -448,17 +473,23 @@ fun InputTextItem(
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusManger[index + 1].requestFocus()
-                        try{
-                        viewModel.updateCoinDetailCount(coinData[index].id!!, counts.text.toFloat())}
-                        catch (e:Exception){
+                        try {
+                            viewModel.updateCoinDetailCount(
+                                coinData[index].id!!,
+                                counts.text.toFloat()
+                            )
+                        } catch (e: Exception) {
 
                         }
 
                     },
                     onDone = {
-                        try{
-                            viewModel.updateCoinDetailCount(coinData[index].id!!, counts.text.toFloat())
-                        } catch (e:Exception){
+                        try {
+                            viewModel.updateCoinDetailCount(
+                                coinData[index].id!!,
+                                counts.text.toFloat()
+                            )
+                        } catch (e: Exception) {
 
                         }
                         keyboardController?.hide()

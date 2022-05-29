@@ -21,6 +21,11 @@ class CoinRepository(private val mContext:Context) {
 
     }
 
+    fun updateNowCoinId(id:Int){
+        idData = id
+        mConfig.setConfig(Const.ID_DATA,id)
+    }
+
     fun getTitle():String{
         return mContext.getString(R.string.app_name)
     }
@@ -44,4 +49,9 @@ class CoinRepository(private val mContext:Context) {
     fun deleteCoinDetailById(id:Int){
         db.dbDao().deleteCoinDetailById(id)
     }
+
+    fun clearCoinDetail(){
+        db.dbDao().clearCoinDetail(idData)
+    }
+
 }
