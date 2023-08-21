@@ -1,0 +1,3 @@
+[submodule "coin/keystore"]
+	path = coin/keystore
+	url = https://github.com/jmseb3/keystore.git
