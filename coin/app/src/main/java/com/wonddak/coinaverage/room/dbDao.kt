@@ -2,13 +2,18 @@ package com.wonddak.coinaverage.room
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface dbDao {
 
+    @Transaction
+    @Query("SELECT * FROM CoinInfo")
+    fun getAll(): Flow<List<CoinInfoAndCoinDetail>>
+
     // 코인정보 관련
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCoinInfoData(coinInfo: CoinInfo) : Long
+    fun insertCoinInfoData(coinInfo: CoinInfo): Long
 
     @Delete
     fun deleteCoinInfoData(coinInfo: CoinInfo)

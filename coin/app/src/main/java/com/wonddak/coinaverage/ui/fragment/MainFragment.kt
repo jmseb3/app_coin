@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -42,6 +43,14 @@ class MainFragment : Fragment() {
         val iddata = config.getIdData()
         val format = config.getDec()
         val dec = DecimalFormat(format)
+        lifecycleScope.launch {
+            db.dbDao().getAll().collect {
+                it.forEach {
+                    Log.d("data", it.toString())
+                }
+            }
+        }
+
 
         binding.coinrecycler.addItemDecoration(
             DividerItemDecoration(
