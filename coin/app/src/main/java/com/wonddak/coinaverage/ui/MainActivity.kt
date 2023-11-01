@@ -31,6 +31,7 @@ import com.wonddak.coinaverage.ui.fragment.CoinInfoFragment
 import com.wonddak.coinaverage.ui.fragment.GraphFragment
 import com.wonddak.coinaverage.ui.fragment.ListFragment
 import com.wonddak.coinaverage.ui.fragment.MainFragment
+import com.wonddak.coinaverage.util.Config
 
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -45,11 +46,23 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     var nowPosition = -1
     var priceOrCount = false
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    private val config by lazy { Config.getInstance(this@MainActivity) }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "dec" || key == "next") {
-            Log.d("data","변경감지")
+            Log.d("data", "변경감지 : $key")
+            if (key == "dec") {
+                sharedPreferences.getString(key, "#,###.00")?.let { config.setDec(it) }
+            }
+            if (key == "next") {
+                sharedPreferences.getBoolean(key, false)?.let { config.setNext(it) }
+            }
+
+            PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this)
+
             this.recreate()
-            overridePendingTransition(0,0)
+            overridePendingTransition(0, 0)
         }
     }
 
@@ -60,8 +73,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         setContentView(binding.root)
         mDrawerLayout = binding.drawerLayout
 
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        prefs.registerOnSharedPreferenceChangeListener(this)
+        PreferenceManager.getDefaultSharedPreferences(this)
+            .registerOnSharedPreferenceChangeListener(this)
 
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
@@ -104,30 +117,35 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     intent.data = Uri.parse("market://details?id=com.wonddak.coinaverage")
                     startActivity(intent)
                 }
+
                 R.id.nav_list -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, ListFragment())
                         .commit()
                 }
+
                 R.id.nav_main -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, MainFragment())
                         .commit()
                 }
+
                 R.id.nav_graph -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, GraphFragment())
                         .commit()
                 }
+
                 R.id.nav_info -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.main_frag_area, CoinInfoFragment())
                         .commit()
                 }
+
                 R.id.nav_mail -> {
                     val email = Intent(Intent.ACTION_SEND)
                     email.type = "plain/text"
@@ -137,10 +155,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     email.putExtra(Intent.EXTRA_TEXT, "내용:")
                     startActivity(email)
                 }
-                R.id.nav_setting ->{
-                    val intent = Intent(this,SettingsActivity::class.java)
+
+                R.id.nav_setting -> {
+                    val intent = Intent(this, SettingsActivity::class.java)
                     startActivity(intent)
-                    overridePendingTransition(0,0)
+                    overridePendingTransition(0, 0)
                 }
             }
             true
@@ -165,13 +184,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     override fun onPause() {
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this)
 
         appUpdateManager
             .appUpdateInfo
@@ -217,6 +234,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 mDrawerLayout!!.openDrawer(GravityCompat.START)
 
             }
+
             R.id.action_new -> {
                 Dialog(this, this, supportFragmentManager).newGameStart(1, null)
             }

@@ -14,6 +14,7 @@ import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.databinding.ItemCoinListBinding
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinInfo
+import com.wonddak.coinaverage.util.Config
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,40 +28,41 @@ class ListRecyclerAdaper(
     val activity: MainActivity
 ) : RecyclerView.Adapter<ListRecyclerAdaper.ViewHolder>() {
 
+    private val config = Config.getInstance(context)
+
     inner class ViewHolder(binding: ItemCoinListBinding) : RecyclerView.ViewHolder(binding.root) {
         val itemName = binding.itemText
         val itemprice = binding.itemPrice
         val itemcount = binding.itemCount
 
-        val prefs: SharedPreferences = context.getSharedPreferences(
-            "coindata",
-            Context.MODE_PRIVATE
-        )
-        val editor = prefs.edit()
         val db = AppDatabase.getInstance(context)
 
         init {
 
             binding.clearItem.setOnClickListener {
-                if(itemlist.size <=1){
-                    Toast.makeText(context,"최소 하나는 존재해야 합니다.",Toast.LENGTH_SHORT).show()
-                }else{
-                    Dialog(context,activity,fragmentManager).delete(itemlist[layoutPosition].coinId)
-                    try {
-                        editor.putInt("iddata",itemlist[layoutPosition-1].coinId!!)
-                        editor.commit()
-                    } catch (e:IndexOutOfBoundsException){
-                        editor.putInt("iddata",itemlist[layoutPosition+1].coinId!!)
-                        editor.commit()
+                if (itemlist.size <= 1) {
+                    Toast.makeText(context, "최소 하나는 존재해야 합니다.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Dialog(
+                        context,
+                        activity,
+                        fragmentManager
+                    ).delete(itemlist[layoutPosition].coinId)
+                    runCatching {
+                        itemlist[layoutPosition - 1].coinId!!
+                    }.onSuccess {
+                        config.setId(it)
+                    }.onFailure {
+                        config.setId(itemlist[layoutPosition + 1].coinId!!)
                     }
                 }
 
             }
             binding.itemListAll.setOnClickListener {
-                changedata(db, layoutPosition, editor)
+                changedata(db, layoutPosition)
             }
             itemName.setOnClickListener {
-                changedata(db, layoutPosition, editor)
+                changedata(db, layoutPosition)
             }
 
             binding.itemListAll.setOnLongClickListener {
@@ -75,11 +77,10 @@ class ListRecyclerAdaper(
         }
     }
 
-    fun changedata(db: AppDatabase, layoutPosition: Int, editor: SharedPreferences.Editor) {
+    fun changedata(db: AppDatabase, layoutPosition: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             var id = db.dbDao().getCoinInfoIdByName(itemlist[layoutPosition].coinName)
-            editor.putInt("iddata", id)
-            editor.commit()
+            config.setId(id)
             launch(Dispatchers.Main) {
                 fragmentManager
                     .beginTransaction()

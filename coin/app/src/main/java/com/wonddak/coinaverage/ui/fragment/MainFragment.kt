@@ -18,6 +18,7 @@ import com.wonddak.coinaverage.databinding.FragmentMainBinding
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.ui.MainActivity
+import com.wonddak.coinaverage.util.Config
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,7 +28,7 @@ class MainFragment : Fragment() {
     private var mainActivity: MainActivity? = null
     private var adapter: coinRecylcerAdapter? = null
     private lateinit var binding: FragmentMainBinding
-
+    private val config by lazy { Config.getInstance(requireContext()) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,11 +36,11 @@ class MainFragment : Fragment() {
     ): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity!!)
+        val prefs = config.prefs
         val db = AppDatabase.getInstance(requireContext())
 
-        val iddata = prefs.getInt("iddata", 1)
-        val format = prefs.getString("dec", "#,###.00")
+        val iddata = config.getIdData()
+        val format = config.getDec()
         val dec = DecimalFormat(format)
 
         binding.coinrecycler.addItemDecoration(
@@ -68,10 +69,10 @@ class MainFragment : Fragment() {
 
             sum = 0.0f
             count = 0.0f
-            val next_check = prefs.getBoolean("next",false)
-            binding.coinrecycler.scrollToPosition(it.size-1)
+            val next_check = config.getNext()
+            binding.coinrecycler.scrollToPosition(it.size - 1)
             binding.coinrecycler.scrollToPosition(0)
-            if(!next_check){
+            if (!next_check) {
                 mainActivity!!.nowPosition = -1
                 mainActivity!!.priceOrCount = false
             }
@@ -89,16 +90,16 @@ class MainFragment : Fragment() {
 
             var avg = sum / count
             if (sum != 0.0F) {
-                binding.totalprice.text = WonText(sum,prefs)
+                binding.totalprice.text = WonText(sum)
             } else {
-                binding.totalprice.text = WonText(0.0f,prefs)
+                binding.totalprice.text = WonText(0.0f)
             }
             binding.totalcount.text = count.toString() + "개"
 
             if (count != 0.0F) {
-                binding.totalavg.text = WonText(avg,prefs)
+                binding.totalavg.text = WonText(avg)
             } else {
-                binding.totalavg.text = WonText(0.0f,prefs)
+                binding.totalavg.text = WonText(0.0f)
 
             }
         })
@@ -130,9 +131,8 @@ class MainFragment : Fragment() {
         return binding.root
     }
 
-    fun WonText(value: Float,prefs : SharedPreferences): String {
-        val format = prefs.getString("dec", "#,###.00")
-        val dec = DecimalFormat(format)
+    fun WonText(value: Float): String {
+        val dec = DecimalFormat(config.getDec())
         return dec.format(value).toString() + "원"
     }
 
