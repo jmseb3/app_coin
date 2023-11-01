@@ -36,4 +36,8 @@ data class CoinInfoAndCoinDetail(
     )
 
     val coinDetailList: List<CoinDetail>
-)
+
+) {
+    val coinDetailPriceList : List<Float> = coinDetailList.map { it.coinPrice }
+    val coinDetailCountList : List<Float> = coinDetailList.map { it.coinCount }
+}
