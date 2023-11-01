@@ -1,12 +1,14 @@
-package com.wonddak.coinaverage.ui
+package com.wonddak.coinaverage.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CoinViewModel(
@@ -19,6 +21,19 @@ class CoinViewModel(
 
     val totalCoinList: StateFlow<List<CoinInfoAndCoinDetail>>
         get() = _totalCoinList
+
+    private var _idData: MutableStateFlow<Int> = MutableStateFlow(1)
+
+    val idData: StateFlow<Int>
+        get() = _idData
+
+    val nowInfo: StateFlow<CoinInfoAndCoinDetail?> = totalCoinList.combine(idData) { a, b ->
+        a.find { it.coinInfo.coinId == b }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = null
+    )
 
     init {
         viewModelScope.launch {

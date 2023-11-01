@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.PreferenceManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
@@ -27,11 +28,14 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.databinding.ActivityMainBinding
+import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.ui.fragment.CoinInfoFragment
 import com.wonddak.coinaverage.ui.fragment.GraphFragment
 import com.wonddak.coinaverage.ui.fragment.ListFragment
 import com.wonddak.coinaverage.ui.fragment.MainFragment
 import com.wonddak.coinaverage.util.Config
+import com.wonddak.coinaverage.viewmodel.CoinViewModel
+import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
 
 
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
@@ -47,6 +51,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     var priceOrCount = false
 
     private val config by lazy { Config.getInstance(this@MainActivity) }
+    private lateinit var viewModel: CoinViewModel
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         if (key == "dec" || key == "next") {
@@ -72,6 +77,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mDrawerLayout = binding.drawerLayout
+        val db = AppDatabase.getInstance(this)
+        val factory = CoinViewModelFactory(db)
+        viewModel = ViewModelProvider(this,factory).get(CoinViewModel::class.java)
 
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)

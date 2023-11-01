@@ -8,7 +8,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
@@ -20,8 +23,10 @@ import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.ui.MainActivity
 import com.wonddak.coinaverage.util.Config
+import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 
@@ -30,6 +35,7 @@ class MainFragment : Fragment() {
     private var adapter: coinRecylcerAdapter? = null
     private lateinit var binding: FragmentMainBinding
     private val config by lazy { Config.getInstance(requireContext()) }
+    private val viewModel :CoinViewModel  by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,14 +49,6 @@ class MainFragment : Fragment() {
         val iddata = config.getIdData()
         val format = config.getDec()
         val dec = DecimalFormat(format)
-        lifecycleScope.launch {
-            db.dbDao().getAll().collect {
-                it.forEach {
-                    Log.d("data", it.toString())
-                }
-            }
-        }
-
 
         binding.coinrecycler.addItemDecoration(
             DividerItemDecoration(
@@ -58,9 +56,13 @@ class MainFragment : Fragment() {
                 LinearLayoutManager.VERTICAL
             )
         )
-
         var sum: Float
         var count: Float
+        lifecycleScope.launch {
+            viewModel.nowInfo.collect {
+                Log.d("data",it.toString())
+            }
+        }
 
         GlobalScope.launch(Dispatchers.IO) {
             var name = db.dbDao().getCoinInfoNameById(iddata)
