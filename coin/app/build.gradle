@@ -14,8 +14,8 @@ android {
         applicationId "com.wonddak.coinaverage"
         minSdkVersion 24
         targetSdk 33
-        versionCode 16
-        versionName "4.2.1"
+        versionCode 17
+        versionName "4.2.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
