@@ -1,6 +1,7 @@
 package com.wonddak.coinaverage.ui
 
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,6 +13,7 @@ import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -24,6 +26,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.install.model.ActivityResult
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.wonddak.coinaverage.R
@@ -34,6 +37,7 @@ import com.wonddak.coinaverage.ui.fragment.GraphFragment
 import com.wonddak.coinaverage.ui.fragment.ListFragment
 import com.wonddak.coinaverage.ui.fragment.MainFragment
 import com.wonddak.coinaverage.util.Config
+import com.wonddak.coinaverage.util.DataManager
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
 
@@ -51,16 +55,48 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     var priceOrCount = false
 
     private val config by lazy { Config.getInstance(this@MainActivity) }
+    private val dataManager by lazy { DataManager.getInstance(this@MainActivity) }
     private lateinit var viewModel: CoinViewModel
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    private val exportLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val fileUri = result.data?.data
+            if (fileUri == null) {
+                Toast.makeText(this@MainActivity, "에러 발생! 올바른 위치를 지정해주세요.", Toast.LENGTH_SHORT).show()
+            } else {
+                dataManager.export(
+                    fileUri,
+                    { Toast.makeText(this@MainActivity, "저장에 실패하엿습니다.", Toast.LENGTH_SHORT).show() }
+                ) {
+                    Toast.makeText(this@MainActivity, "성공적으로 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        }
+
+    private val importLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val fileUri = result.data?.data
+            if (fileUri == null) {
+                Toast.makeText(this@MainActivity, "에러 발생! 파일을 불러오는데 실패했습니다..", Toast.LENGTH_SHORT).show()
+            } else {
+                dataManager.import(
+                    fileUri,
+                    { Toast.makeText(this@MainActivity, "데이터를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show() }
+                ) {
+                    Toast.makeText(this@MainActivity, "성공적으로 불러왔습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "dec" || key == "next") {
             Log.d("data", "변경감지 : $key")
             if (key == "dec") {
-                sharedPreferences.getString(key, "#,###.00")?.let { config.setDec(it) }
+                sharedPreferences?.getString(key, "#,###.00")?.let { config.setDec(it) }
             }
             if (key == "next") {
-                sharedPreferences.getBoolean(key, false)?.let { config.setNext(it) }
+                sharedPreferences?.getBoolean(key, false)?.let { config.setNext(it) }
             }
 
             PreferenceManager.getDefaultSharedPreferences(this)
@@ -79,7 +115,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         mDrawerLayout = binding.drawerLayout
         val db = AppDatabase.getInstance(this)
         val factory = CoinViewModelFactory(db)
-        viewModel = ViewModelProvider(this,factory).get(CoinViewModel::class.java)
+        viewModel = ViewModelProvider(this, factory).get(CoinViewModel::class.java)
 
         PreferenceManager.getDefaultSharedPreferences(this)
             .registerOnSharedPreferenceChangeListener(this)
@@ -169,6 +205,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                 }
+
+                R.id.data_export -> {
+                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_TITLE, "coinAvg_${System.currentTimeMillis()}.cData")
+                    }.let { intent ->
+                        exportLauncher.launch(intent)
+                    }
+                }
+
+                R.id.data_import -> {
+                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "*/*"
+                    }.let { intent ->
+                        importLauncher.launch(intent)
+                    }
+                }
             }
             true
         }
@@ -252,6 +307,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
 
     override fun onBackPressed() {
+        super.onBackPressed()
         if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout!!.closeDrawers()
         } else if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
@@ -263,10 +319,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
             finish();
         }
-
-
     }
-
 
 }
 

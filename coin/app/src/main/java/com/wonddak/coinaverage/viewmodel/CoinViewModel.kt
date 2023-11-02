@@ -37,7 +37,7 @@ class CoinViewModel(
 
     init {
         viewModelScope.launch {
-            db.dbDao().getAll().collect {
+            db.dbDao().getAllFlow().collect {
                 _totalCoinList.value = it
             }
         }

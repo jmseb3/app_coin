@@ -1,6 +1,7 @@
 package com.wonddak.coinaverage.room
 
 import androidx.room.*
+import kotlinx.serialization.Serializable
 
 @Entity
 data class CoinInfo(

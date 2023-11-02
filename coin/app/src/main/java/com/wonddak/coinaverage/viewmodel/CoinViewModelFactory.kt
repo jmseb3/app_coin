@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.wonddak.coinaverage.room.AppDatabase
 
 class CoinViewModelFactory(
-    val db :AppDatabase
-) :ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    private val db: AppDatabase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CoinViewModel::class.java)) {
             return CoinViewModel(db) as T
         }

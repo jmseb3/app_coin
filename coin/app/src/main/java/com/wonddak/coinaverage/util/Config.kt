@@ -5,10 +5,9 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 class Config(context: Context) {
-
-    val prefs: SharedPreferences = context.getSharedPreferences("coindata", Context.MODE_PRIVATE)
-
     companion object {
+        private const val PrefName = "coindata"
+
         private var instance :Config? = null
         fun getInstance(context: Context) : Config {
             if (instance == null) {
@@ -23,6 +22,7 @@ class Config(context: Context) {
             const val IdData = "iddata"
         }
     }
+    val prefs: SharedPreferences = context.getSharedPreferences(PrefName, Context.MODE_PRIVATE)
 
     fun getIdData() : Int {
         return prefs.getInt(Key.IdData,1)
