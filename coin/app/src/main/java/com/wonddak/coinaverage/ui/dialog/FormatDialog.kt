@@ -1,0 +1,71 @@
+package com.wonddak.coinaverage.ui.dialog
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import com.wonddak.coinaverage.ui.theme.MATCH1
+import com.wonddak.coinaverage.ui.theme.MATCH2
+
+@Composable
+fun FormatDialog(
+    onDismissRequest: () -> Unit,
+    action: (format: String) -> Unit
+) {
+    val title = listOf(
+        "#,###",
+        "#,###.0",
+        "#,###.00",
+        "#,###.000",
+        "#,###.0000",
+    )
+    Dialog(onDismissRequest = onDismissRequest) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(20.dp),
+            color = MATCH2
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Text(
+                    text = "표시 형식 선택",
+                    color = MATCH1,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = TextUnit(16f, TextUnitType.Sp)
+                )
+                title.forEachIndexed { index, format ->
+                    OutlinedButton(
+                        onClick = { action(format) },
+                        modifier = Modifier.fillMaxWidth(),
+                        border = BorderStroke(1.dp, MATCH1)
+                    ) {
+                        Text(
+                            text = "소수점 $index 개",
+                            color = MATCH1
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

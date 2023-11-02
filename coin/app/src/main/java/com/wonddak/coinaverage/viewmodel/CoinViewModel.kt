@@ -29,6 +29,16 @@ class CoinViewModel(
         started = SharingStarted.WhileSubscribed(),
         initialValue = 1
     )
+    val next = config.getNext().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = false
+    )
+    val dec = config.getDec().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = "#,###.00"
+    )
 
     val nowInfo: StateFlow<CoinInfoAndCoinDetail?> = totalCoinList.combine(id) { list, id ->
         list.find { it.coinInfo.coinId == id }
@@ -46,19 +56,19 @@ class CoinViewModel(
         }
     }
 
-    fun setId(id:Int) {
+    fun setId(id: Int) {
         viewModelScope.launch {
             config.setId(id)
         }
     }
 
-    fun setDec(dec:String) {
+    fun setDec(dec: String) {
         viewModelScope.launch {
             config.setDec(dec)
         }
     }
 
-    fun setNext(next:Boolean) {
+    fun setNext(next: Boolean) {
         viewModelScope.launch {
             config.setNext(next)
         }
