@@ -24,12 +24,10 @@ import kotlin.IndexOutOfBoundsException
 class coinRecylcerAdapter(
     val context: Context,
     var itemInfo: List<CoinDetail>,
-    val dec: DecimalFormat,
     val activity: MainActivity,
-    val prefs: SharedPreferences
 ) : RecyclerView.Adapter<coinRecylcerAdapter.ViewHolder>() {
 
-
+    val dec = DecimalFormat("#,###.00")
     inner class ViewHolder(binding: ItemlistBinding) : RecyclerView.ViewHolder(binding.root) {
         val itemcount: EditText = binding.itemcounts
         val itemprice: EditText = binding.itemprices
@@ -37,8 +35,8 @@ class coinRecylcerAdapter(
         val itemrank: TextView = binding.itemrank
 
         val db = AppDatabase.getInstance(context)
-        val iddata = prefs.getInt("iddata", 1)
-
+        val iddata = 1
+//        val iddata = prefs.getInt("iddata", 1)
 
         init {
             // 합계 클릭시 개별 초기화
@@ -97,8 +95,10 @@ class coinRecylcerAdapter(
         holder.itemrank.text = "#" + (position + 1)
 
         val db = AppDatabase.getInstance(context)
-        val iddata = prefs.getInt("iddata", 1)
-        val next_check = prefs.getBoolean("next", false)
+//        val iddata = prefs.getInt("iddata", 1)
+//        val next_check = prefs.getBoolean("next", false)
+        val iddata = 1
+        val next_check = false
 
         if (position == activity.nowPosition) {
             if (activity.priceOrCount) {

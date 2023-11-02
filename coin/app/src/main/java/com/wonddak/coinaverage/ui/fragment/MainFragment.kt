@@ -43,12 +43,12 @@ class MainFragment : Fragment() {
     ): View? {
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        val prefs = config.prefs
         val db = AppDatabase.getInstance(requireContext())
 
-        val iddata = config.getIdData()
-        val format = config.getDec()
-        val dec = DecimalFormat(format)
+//        val format = config.getDec()
+//        val iddata = config.getIdData()
+        val iddata = 1
+        val format = "#,###.00"
 
         binding.coinrecycler.addItemDecoration(
             DividerItemDecoration(
@@ -80,7 +80,8 @@ class MainFragment : Fragment() {
 
             sum = 0.0f
             count = 0.0f
-            val next_check = config.getNext()
+//            val next_check = config.getNext()
+            val next_check = false
             binding.coinrecycler.scrollToPosition(it.size - 1)
             binding.coinrecycler.scrollToPosition(0)
             if (!next_check) {
@@ -88,7 +89,7 @@ class MainFragment : Fragment() {
                 mainActivity!!.priceOrCount = false
             }
 
-            adapter = coinRecylcerAdapter(mainActivity!!, it, dec, mainActivity!!, prefs)
+            adapter = coinRecylcerAdapter(mainActivity!!, it, mainActivity!!)
             binding.coinrecycler.adapter = adapter
             val checkpos = mainActivity!!.nowPosition
             if (checkpos != -1) {
@@ -143,7 +144,8 @@ class MainFragment : Fragment() {
     }
 
     fun WonText(value: Float): String {
-        val dec = DecimalFormat(config.getDec())
+        val dec = DecimalFormat("#,###.00")
+//        val dec = DecimalFormat(config.getDec())
         return dec.format(value).toString() + "원"
     }
 

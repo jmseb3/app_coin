@@ -2,10 +2,14 @@ package com.wonddak.coinaverage.ui.fragment
 
 import android.content.Context
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.wonddak.coinaverage.ui.MainActivity
+import com.wonddak.coinaverage.viewmodel.CoinViewModel
 
 abstract class BaseFragment() :Fragment() {
-    private var mainActivity: MainActivity? = null
+    protected var mainActivity: MainActivity? = null
+
+    protected val viewModel by activityViewModels<CoinViewModel>()
 
     fun setTitle(title:String) {
         mainActivity?.setTitle(title)

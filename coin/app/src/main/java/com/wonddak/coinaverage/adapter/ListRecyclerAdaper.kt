@@ -51,9 +51,9 @@ class ListRecyclerAdaper(
                     runCatching {
                         itemlist[layoutPosition - 1].coinId!!
                     }.onSuccess {
-                        config.setId(it)
+//                        config.setId(it)
                     }.onFailure {
-                        config.setId(itemlist[layoutPosition + 1].coinId!!)
+//                        config.setId(itemlist[layoutPosition + 1].coinId!!)
                     }
                 }
 

@@ -1,4 +1,4 @@
-package com.wonddak.coinaverage.ui
+package com.wonddak.coinaverage.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
