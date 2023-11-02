@@ -1,21 +1,52 @@
 package com.wonddak.coinaverage.ui.fragment
 
+import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Divider
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.wonddak.coinaverage.ui.MATCH1
+import com.wonddak.coinaverage.ui.MATCH2
+import com.wonddak.coinaverage.util.Config
+import java.text.DecimalFormat
 
 @Composable
 fun GraphView() {
-
-    val itemList = listOf<String>(
-        "손절매 못한 손실", "복구해야할 수익률",
+    val context = LocalContext.current
+    val title1 = "손절매 못한 손실"
+    val title2 = "복구해야할 수익률"
+    val itemList = listOf(
+        title1, title2,
         "3%", "3.09%",
         "5%", "5.26%",
         "10%", "11.11%",
@@ -28,17 +59,124 @@ fun GraphView() {
         "80%", "400%",
         "90%", "900%"
     )
+    val dec = DecimalFormat("###.00")
+
     var input by remember {
         mutableStateOf("")
     }
-    Column {
+    var percent by remember {
+        mutableStateOf("")
+    }
+    LaunchedEffect(input) {
+        runCatching {
+            if (input.isEmpty()) {
+                percent = ""
+            } else if (input.toFloat() >= 100) {
+                Toast.makeText(context, "손실은 100%보다 클수 없습니다", Toast.LENGTH_SHORT).show()
+                input = ""
+            } else {
+                val minusPer = input.toFloat() / 100
+                val data = dec.format((minusPer / (1 - minusPer)) * 100)
+                percent = data.toString()
+            }
+        }.onFailure {
+            input = ""
+            Toast.makeText(context, "숫자만 입력해주세요", Toast.LENGTH_SHORT).show()
+        }
+    }
 
-        TextField(value = input, onValueChange = { input = it })
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val color = OutlinedTextFieldDefaults.colors(
+            unfocusedBorderColor = MATCH1,
+            focusedBorderColor = MATCH1,
+            disabledBorderColor = MATCH1,
+            disabledTextColor = MATCH1,
+            focusedTextColor = MATCH1,
+            unfocusedTextColor = MATCH1,
+            cursorColor = MATCH1,
+        )
+
+        OutlinedTextField(
+            value = input,
+            onValueChange = {
+                input = if (it.isEmpty()) {
+                    ""
+                } else {
+                    when (it.toFloatOrNull()) {
+                        null -> {
+                            input
+                        }
+
+                        else -> it
+                    }
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            label = {
+                Text(
+                    text = title1,
+                    color = MATCH1
+                )
+            },
+            trailingIcon = {
+                Text(
+                    text = "%",
+                    color = MATCH1
+                )
+            },
+            colors = color
+        )
+
+        Spacer(modifier = Modifier.height(5.dp))
+        OutlinedTextField(
+            value = percent,
+            onValueChange = { },
+            enabled = false,
+            label = {
+                Text(
+                    text = title2,
+                    color = MATCH1
+                )
+            },
+            trailingIcon = {
+                Text(
+                    text = "%",
+                    color = MATCH1
+                )
+            },
+            colors = color
+        )
+
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2)
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .padding(10.dp)
+                .background(MATCH2)
+                .border(2.dp, MATCH1, RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(2.dp))
         ) {
             items(itemList.size) { name ->
-                Text(text = itemList[name])
+                Column {
+                    Text(
+                        text = itemList[name],
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MATCH1)
+                            .padding(PaddingValues(
+                                horizontal = 0.dp,
+                                vertical = 3.dp
+                            )),
+                        textAlign = TextAlign.Center
+                    )
+                    Divider(
+                        color = MATCH2
+                    )
+                }
             }
         }
 

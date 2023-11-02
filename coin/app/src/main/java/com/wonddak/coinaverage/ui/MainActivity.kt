@@ -321,6 +321,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    fun setTitle(title:String) {
+        binding.mainTitle.text = title
+    }
+
 }
 
 
