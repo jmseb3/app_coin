@@ -9,7 +9,11 @@ interface dbDao {
 
     @Transaction
     @Query("SELECT * FROM CoinInfo")
-    fun getAll(): Flow<List<CoinInfoAndCoinDetail>>
+    fun getAllFlow(): Flow<List<CoinInfoAndCoinDetail>>
+
+    @Transaction
+    @Query("SELECT * FROM CoinInfo")
+    fun getAll(): List<CoinInfoAndCoinDetail>
 
     // 코인정보 관련
     @Insert(onConflict = OnConflictStrategy.REPLACE)

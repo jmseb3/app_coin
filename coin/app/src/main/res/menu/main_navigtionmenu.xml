@@ -3,8 +3,7 @@
     <item
         android:id="@+id/nav_top"
         android:title="@string/app_name">
-        <menu
-            android:checkableBehavior="single">
+        <menu android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_main"
                 android:icon="@drawable/ic_baseline_home_24"
@@ -26,22 +25,30 @@
     </item>
     <item
         android:id="@+id/nav_mid"
-        android:title="설정"
-        android:icon="@drawable/ic_baseline_settings_24">
-        <menu
-            android:checkableBehavior="single">
+        android:icon="@drawable/ic_baseline_settings_24"
+        android:title="설정">
+        <menu android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_baseline_settings_24"
                 android:title="설정" />
+
+            <item
+                android:id="@+id/data_export"
+                android:icon="@drawable/baseline_cloud_upload_24"
+                android:title="내보내기" />
+
+            <item
+                android:id="@+id/data_import"
+                android:icon="@drawable/baseline_cloud_download_24"
+                android:title="가져오기" />
 
         </menu>
     </item>
     <item
         android:id="@+id/nav_bottom"
         android:title="기타">
-        <menu
-            android:checkableBehavior="single">
+        <menu android:checkableBehavior="single">
             <item
                 android:id="@+id/nav_mail"
                 android:icon="@drawable/ic_baseline_email_24"
