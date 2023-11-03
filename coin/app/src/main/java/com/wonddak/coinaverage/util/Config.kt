@@ -1,8 +1,6 @@
 package com.wonddak.coinaverage.util
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
@@ -11,7 +9,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.preference.Preference
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

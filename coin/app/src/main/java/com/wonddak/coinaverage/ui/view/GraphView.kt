@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,8 +15,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Divider
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -83,17 +82,11 @@ fun GraphView() {
     }
 
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MATCH2),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val color = OutlinedTextFieldDefaults.colors(
-            unfocusedBorderColor = MATCH1,
-            focusedBorderColor = MATCH1,
-            disabledBorderColor = MATCH1,
-            disabledTextColor = MATCH1,
-            focusedTextColor = MATCH1,
-            unfocusedTextColor = MATCH1,
-            cursorColor = MATCH1,
-        )
         CommonTextField(
             value = input,
             onValueChange = {
@@ -125,7 +118,7 @@ fun GraphView() {
         CommonTextField(
             value = percent,
             onValueChange = { },
-            enabled = false,
+            readOnly = true,
             labelText = title2,
             trailingIcon = {
                 Text(

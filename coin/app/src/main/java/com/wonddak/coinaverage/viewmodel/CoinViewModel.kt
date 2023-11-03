@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
+import com.wonddak.coinaverage.room.CoinInfo
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import com.wonddak.coinaverage.util.Config
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +75,16 @@ class CoinViewModel(
     fun setNext(next: Boolean) {
         viewModelScope.launch {
             config.setNext(next)
+        }
+    }
+
+    fun insertCoin(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val id = db.dbDao().insertCoinInfoData(CoinInfo(null, name)).toInt()
+            repeat(2) {
+                db.dbDao().insertCoinDetailData(CoinDetail(null, id))
+            }
+            setId(id)
         }
     }
 

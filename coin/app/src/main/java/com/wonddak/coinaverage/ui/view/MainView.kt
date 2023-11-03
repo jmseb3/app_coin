@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -67,12 +68,16 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainView(
-    viewModel: CoinViewModel
+    viewModel: CoinViewModel,
+    updateTitle :(name:String) -> Unit
 ) {
     val nowInfo by viewModel.nowInfo.collectAsState()
     val dec by viewModel.dec.collectAsState()
     val next by viewModel.next.collectAsState()
 
+    LaunchedEffect(nowInfo) {
+        nowInfo?.coinInfo?.coinName?.let { updateTitle(it) }
+    }
     nowInfo?.let { item ->
         MainContent(
             item,
@@ -119,7 +124,8 @@ private fun MainContent(
 
     Box(
         modifier = Modifier
-            .fillMaxHeight(0.85f)
+            .fillMaxSize()
+            .background(MATCH2)
             .padding(10.dp),
     ) {
         Column {

@@ -2,6 +2,7 @@ package com.wonddak.coinaverage.ui.view
 
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,14 +52,15 @@ import com.wonddak.coinaverage.viewmodel.CoinViewModel
 
 @Composable
 fun CoinListView(
-    viewModel: CoinViewModel
+    viewModel: CoinViewModel,
+    moveToMain:() -> Unit
 ) {
     val dec by viewModel.dec.collectAsState()
     val totalCoinList by viewModel.totalCoinList.collectAsState()
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().background(MATCH2)
     ) {
         CommonText(
             text = "길게 눌러서 이름 수정이 가능합니다.",
@@ -76,6 +78,7 @@ fun CoinListView(
                     dec = dec,
                     clickItem = {
                         viewModel.setId(item.getCoinId())
+                        moveToMain()
                     },
                     clickLongItem = { name ->
                         viewModel.updateCoinName(item.getCoinId(), name)

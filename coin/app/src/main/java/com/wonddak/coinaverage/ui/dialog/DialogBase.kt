@@ -38,13 +38,16 @@ fun DialogBase(
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(20.dp)
-            ) {
+                modifier = Modifier
+                    .padding(20.dp)
+                    .wrapContentHeight(),
+
+                ) {
                 if (title != null) {
                     CommonText(
                         text = title,
                         textSize = 20f,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                 }
@@ -56,7 +59,7 @@ fun DialogBase(
 
 @Composable
 fun DialogButton(
-    text :String,
+    text: String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit

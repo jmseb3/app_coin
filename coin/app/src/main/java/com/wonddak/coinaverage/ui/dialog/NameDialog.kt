@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,9 +15,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
-import com.wonddak.coinaverage.ui.common.CommonText
 import com.wonddak.coinaverage.ui.common.CommonTextField
-import com.wonddak.coinaverage.ui.theme.MATCH1
 
 @Composable
 fun NameDialog(
@@ -58,6 +53,7 @@ fun NameDialog(
                 enabled = name.isNotEmpty()
             ) {
                 action(name)
+                onDismissRequest()
             }
             DialogButton(
                 "취소",
