@@ -29,6 +29,7 @@ class CoinViewModel(
         started = SharingStarted.WhileSubscribed(),
         initialValue = 1
     )
+
     val next = config.getNext().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
