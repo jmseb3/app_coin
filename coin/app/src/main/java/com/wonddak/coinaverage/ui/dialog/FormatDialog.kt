@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.wonddak.coinaverage.Const
 import com.wonddak.coinaverage.ui.theme.MATCH1
 import com.wonddak.coinaverage.ui.theme.MATCH2
 
@@ -28,43 +29,17 @@ fun FormatDialog(
     onDismissRequest: () -> Unit,
     action: (format: String) -> Unit
 ) {
-    val title = listOf(
-        "#,###",
-        "#,###.0",
-        "#,###.00",
-        "#,###.000",
-        "#,###.0000",
-    )
-    Dialog(onDismissRequest = onDismissRequest) {
-        Surface(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .wrapContentHeight(),
-            shape = RoundedCornerShape(20.dp),
-            color = MATCH2
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(10.dp)
-            ) {
+    val title = Const.DecFormat.values()
+    DialogBase(
+        onDismissRequest = onDismissRequest,
+        title = "표시 형식 선택"
+    ) {
+        title.forEachIndexed { index, format ->
+            DialogButton(onClick = { action(format.dec) }) {
                 Text(
-                    text = "표시 형식 선택",
-                    color = MATCH1,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = TextUnit(16f, TextUnitType.Sp)
+                    text = "소수점 $index 개",
+                    color = MATCH1
                 )
-                title.forEachIndexed { index, format ->
-                    OutlinedButton(
-                        onClick = { action(format) },
-                        modifier = Modifier.fillMaxWidth(),
-                        border = BorderStroke(1.dp, MATCH1)
-                    ) {
-                        Text(
-                            text = "소수점 $index 개",
-                            color = MATCH1
-                        )
-                    }
-                }
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import com.wonddak.coinaverage.util.Config
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -75,4 +76,15 @@ class CoinViewModel(
         }
     }
 
+    fun updateCoinName(coinId: Int, name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao().updateCoinInfoName(coinId, name)
+        }
+    }
+
+    fun deleteCoin(coinId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao().deleteCoinInfolById(coinId)
+        }
+    }
 }

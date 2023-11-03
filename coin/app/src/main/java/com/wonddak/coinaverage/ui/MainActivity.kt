@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_new -> {
-                Dialog(this, this, supportFragmentManager).newGameStart(1, null)
+                Dialog(this, supportFragmentManager).newGameStart( null)
             }
         }
         return super.onOptionsItemSelected(item)
