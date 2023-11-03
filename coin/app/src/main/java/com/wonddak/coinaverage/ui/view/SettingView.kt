@@ -41,12 +41,15 @@ import com.wonddak.coinaverage.ui.theme.MATCH2
 import com.wonddak.coinaverage.ui.theme.maple
 import com.wonddak.coinaverage.util.DataManager
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
+import java.text.SimpleDateFormat
 
 @Composable
 fun SettingView(
     viewModel: CoinViewModel,
     showReward: () -> Unit
 ) {
+    val rewardTime by viewModel.reward.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +57,7 @@ fun SettingView(
     ) {
         SectionOption(viewModel)
         SectionData()
-        SectionEtc(showReward)
+        SectionEtc(rewardTime, showReward)
     }
 }
 
@@ -178,14 +181,24 @@ private fun SectionData() {
 
 @Composable
 private fun SectionEtc(
+    reward: Long,
     showReward: () -> Unit
 ) {
+    val default = "리워드 광고를 시청하고 24시간동안 배너광고없이 사용해 보세요."
 
+    val description = if (reward == 0L) {
+        default
+    } else {
+        val endTime = reward + 1000 * (60 * 60 * 24)
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        default + "\n 만료기간 : " + format.format(endTime)
+
+    }
     SectionView(section = "기타") {
         SectionRow(
             painter = painterResource(id = R.drawable.baseline_ads_click_24),
             text = "광고보고 배너광고 없애기",
-            description = "리워드 광고를 시청하고 24시간동안 배너광고없이 사용해 보세요."
+            description = description
         ) {
             showReward()
         }

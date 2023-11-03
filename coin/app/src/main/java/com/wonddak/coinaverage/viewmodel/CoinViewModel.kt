@@ -39,10 +39,16 @@ class CoinViewModel(
         started = SharingStarted.WhileSubscribed(),
         initialValue = false
     )
+
     val dec = config.getDec().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
         initialValue = "#,###.00"
+    )
+    val reward = config.getReward().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = 0L
     )
 
     val nowInfo: StateFlow<CoinInfoAndCoinDetail?> = totalCoinList.combine(id) { list, id ->
@@ -57,12 +63,11 @@ class CoinViewModel(
         viewModelScope.launch {
             db.dbDao().getAllFlow().collect {
                 _totalCoinList.value = it
-                Log.d("JWH", it.toString())
             }
         }
         viewModelScope.launch {
-            id.collect {
-                Log.d("JWH", "get Id : $it")
+            reward.collect {
+                Log.d("JWH", "get reward : $it")
             }
         }
     }
@@ -82,6 +87,12 @@ class CoinViewModel(
     fun setNext(next: Boolean) {
         viewModelScope.launch {
             config.setNext(next)
+        }
+    }
+
+    fun setReward(time:Long) {
+        viewModelScope.launch {
+            config.setReward(time)
         }
     }
 

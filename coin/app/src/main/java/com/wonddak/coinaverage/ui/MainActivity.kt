@@ -49,6 +49,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.wonddak.coinaverage.Const
+import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.ui.dialog.NameDialog
 import com.wonddak.coinaverage.ui.main.AdvertView
@@ -119,7 +120,7 @@ class MainActivity : ComponentActivity() {
         MobileAds.initialize(this) {}
         RewardedAd.load(
             this,
-            "ca-app-pub-3940256099942544/5224354917",
+            getString(R.string.reward_ad_unit_id),
             adRequest!!,
             object : RewardedAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
@@ -198,16 +199,13 @@ class MainActivity : ComponentActivity() {
                     val snackbarHostState = remember { SnackbarHostState() }
 
 
-                    val nowInfo by viewModel.nowInfo.collectAsState()
-                    val dec by viewModel.dec.collectAsState()
-                    val next by viewModel.next.collectAsState()
-
                     var title by remember {
                         mutableStateOf("")
                     }
                     var showAddDialog by remember {
                         mutableStateOf(false)
                     }
+                    val rewardTime by viewModel.reward.collectAsState()
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
@@ -245,7 +243,9 @@ class MainActivity : ComponentActivity() {
                                     .padding(padding)
                                     .background(MATCH2)
                             ) {
-                                AdvertView()
+                                if (rewardTime == 0L || System.currentTimeMillis() >= rewardTime + 1000 * (60 * 60 * 24)) {
+                                    AdvertView()
+                                }
                                 NavHost(
                                     navController = navController,
                                     startDestination = Const.Nav.Main
@@ -328,15 +328,17 @@ class MainActivity : ComponentActivity() {
     private fun showRewardAd() {
         rewardedAd?.let { ad ->
             ad.show(
-                this@MainActivity,
-                OnUserEarnedRewardListener { rewardItem ->
-                    // Handle the reward.
-                    val rewardAmount = rewardItem.amount
-                    val rewardType = rewardItem.type
-                    Log.d("JWH", "User earned the reward.")
-                })
+                this@MainActivity
+            ) { rewardItem ->
+                // Handle the reward.
+                val rewardAmount = rewardItem.amount
+                val rewardType = rewardItem.type
+                Log.d("JWH", "User earned the reward.")
+                viewModel.setReward(System.currentTimeMillis())
+            }
         } ?: run {
             Log.d("JWH", "The rewarded ad wasn't ready yet.")
+            Toast.makeText(this,"현재 준비된 광고가 없습니다.",Toast.LENGTH_SHORT).show()
         }
     }
 }

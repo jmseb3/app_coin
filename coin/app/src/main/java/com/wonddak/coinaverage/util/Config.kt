@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
@@ -32,6 +33,7 @@ class Config(context: Context) {
             val NextKey = booleanPreferencesKey(Next)
             val DecKey = stringPreferencesKey(Dec)
             val IdKey = intPreferencesKey(IdData)
+            val Reward = longPreferencesKey("reward")
         }
     }
 
@@ -74,6 +76,14 @@ class Config(context: Context) {
             }
     }
 
+    fun getReward(): Flow<Long> {
+        return dataStore.data
+            .map { preferences ->
+                // No type safety.
+                preferences[Key.Reward] ?: 0L
+            }
+    }
+
     suspend fun setId(id: Int) {
         dataStore.edit { settings ->
             settings[Key.IdKey] = id
@@ -89,6 +99,12 @@ class Config(context: Context) {
     suspend fun setNext(next: Boolean) {
         dataStore.edit { settings ->
             settings[Key.NextKey] = next
+        }
+    }
+
+    suspend fun setReward(time:Long) {
+        dataStore.edit { settings ->
+            settings[Key.Reward] = time
         }
     }
 }
