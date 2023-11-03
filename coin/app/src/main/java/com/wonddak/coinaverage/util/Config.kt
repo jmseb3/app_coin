@@ -54,7 +54,7 @@ class Config(context: Context) {
         return dataStore.data
             .map { preferences ->
                 // No type safety.
-                preferences[Key.IdKey] ?: 0
+                preferences[Key.IdKey] ?: 1
             }
     }
 

@@ -2,12 +2,9 @@ package com.wonddak.coinaverage.ui.dialog
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wonddak.coinaverage.ui.common.CommonText
-import com.wonddak.coinaverage.ui.theme.MATCH1
 
 @Composable
 fun DeleteDialog(

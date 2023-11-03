@@ -1,5 +1,6 @@
 package com.wonddak.coinaverage.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wonddak.coinaverage.room.AppDatabase
@@ -56,6 +57,12 @@ class CoinViewModel(
         viewModelScope.launch {
             db.dbDao().getAllFlow().collect {
                 _totalCoinList.value = it
+                Log.d("JWH", it.toString())
+            }
+        }
+        viewModelScope.launch {
+            id.collect {
+                Log.d("JWH", "get Id : $it")
             }
         }
     }
@@ -96,7 +103,7 @@ class CoinViewModel(
 
     fun deleteCoin(coinId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            db.dbDao().deleteCoinInfolById(coinId)
+            db.dbDao().deleteCoinInfoById(coinId)
         }
     }
 
@@ -121,7 +128,7 @@ class CoinViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             db.dbDao()
-                .updateCoinDetailByCoinitemIdPrice(coinDetailId, coinPrice)
+                .updateCoinDetailPrice(coinDetailId, coinPrice)
         }
     }
 
@@ -131,7 +138,7 @@ class CoinViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             db.dbDao()
-                .updateCoinDetailByCoinitemIdCount(coinDetailId, coinCount)
+                .updateCoinDetailCount(coinDetailId, coinCount)
         }
     }
 
@@ -142,7 +149,7 @@ class CoinViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             db.dbDao()
-                .updateCoinDetailByCoinitemId(coinDetailId, coinPrice, coinCount)
+                .updateCoinDetail(coinDetailId, coinPrice, coinCount)
         }
     }
 

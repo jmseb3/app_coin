@@ -1,6 +1,5 @@
 package com.wonddak.coinaverage.ui.view
 
-import android.content.ClipDescription
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +30,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -47,7 +44,8 @@ import com.wonddak.coinaverage.viewmodel.CoinViewModel
 
 @Composable
 fun SettingView(
-    viewModel: CoinViewModel
+    viewModel: CoinViewModel,
+    showReward: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -56,6 +54,7 @@ fun SettingView(
     ) {
         SectionOption(viewModel)
         SectionData()
+        SectionEtc(showReward)
     }
 }
 
@@ -175,6 +174,22 @@ private fun SectionData() {
         }
     }
 
+}
+
+@Composable
+private fun SectionEtc(
+    showReward: () -> Unit
+) {
+
+    SectionView(section = "기타") {
+        SectionRow(
+            painter = painterResource(id = R.drawable.baseline_ads_click_24),
+            text = "광고보고 배너광고 없애기",
+            description = "리워드 광고를 시청하고 24시간동안 배너광고없이 사용해 보세요."
+        ) {
+            showReward()
+        }
+    }
 }
 
 @Composable

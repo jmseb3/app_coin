@@ -5,7 +5,7 @@
         <item name="windowSplashScreenBackground">@color/match2</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.CoinAverage</item>
-        <item name="windowSplashScreenAnimationDuration">2000</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
     </style>
 
 </resources>

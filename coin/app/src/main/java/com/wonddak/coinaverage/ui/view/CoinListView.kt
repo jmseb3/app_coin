@@ -19,7 +19,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,7 +46,6 @@ import com.wonddak.coinaverage.ui.dialog.DeleteDialog
 import com.wonddak.coinaverage.ui.dialog.NameDialog
 import com.wonddak.coinaverage.ui.theme.MATCH1
 import com.wonddak.coinaverage.ui.theme.MATCH2
-import com.wonddak.coinaverage.ui.theme.maple
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 
 @Composable
