@@ -46,7 +46,7 @@ fun DialogBase(
                 if (title != null) {
                     CommonText(
                         text = title,
-                        textSize = 20f,
+                        textSize = 17f,
                         fontWeight = FontWeight.SemiBold,
                     )
                     Spacer(modifier = Modifier.height(20.dp))

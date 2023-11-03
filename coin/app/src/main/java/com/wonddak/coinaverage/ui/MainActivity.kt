@@ -1,80 +1,88 @@
 package com.wonddak.coinaverage.ui
 
-
-import android.content.Context
+import android.app.AlertDialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import com.wonddak.coinaverage.ui.main.TopAppBarView
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.splashscreen.SplashScreen.KeepOnScreenCondition
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.wonddak.coinaverage.R
-import com.wonddak.coinaverage.databinding.ActivityMainBinding
+import com.wonddak.coinaverage.Const
 import com.wonddak.coinaverage.room.AppDatabase
-import com.wonddak.coinaverage.ui.fragment.CoinInfoFragment
-import com.wonddak.coinaverage.ui.fragment.GraphFragment
-import com.wonddak.coinaverage.ui.fragment.ListFragment
-import com.wonddak.coinaverage.ui.fragment.MainFragment
-import com.wonddak.coinaverage.ui.fragment.SettingFragment
+import com.wonddak.coinaverage.ui.dialog.NameDialog
+import com.wonddak.coinaverage.ui.main.AdvertView
+import com.wonddak.coinaverage.ui.main.DrawerView
+import com.wonddak.coinaverage.ui.theme.MATCH2
+import com.wonddak.coinaverage.ui.view.CoinListView
+import com.wonddak.coinaverage.ui.view.GraphView
+import com.wonddak.coinaverage.ui.view.MainView
+import com.wonddak.coinaverage.ui.view.SettingView
 import com.wonddak.coinaverage.util.Config
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
 import kotlinx.coroutines.launch
 
-
-class MainActivity : AppCompatActivity() {
-
-    lateinit var binding: ActivityMainBinding
-    private lateinit var mAdView: AdView
-    private var mDrawerLayout: DrawerLayout? = null
-    private var backKeyPressedTime: Long = 0
+class MainActivity : ComponentActivity() {
+    private var keep = true
+    private lateinit var viewModel: CoinViewModel
     private lateinit var appUpdateManager: AppUpdateManager
 
+    private var backKeyPressedTime: Long = 0
 
-    var nowPosition = -1
-    var priceOrCount = false
-
-    private val config by lazy { Config.getInstance(this@MainActivity) }
-    private lateinit var viewModel: CoinViewModel
-    private var keep = true
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { keep }
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        mDrawerLayout = binding.drawerLayout
-        val db = AppDatabase.getInstance(this)
-        val factory = CoinViewModelFactory(db, config)
-
-        viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
-
-        lifecycleScope.launch {
-            viewModel.id.collect {
-                if (it > 0) {
-                    keep = false
-                }
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+                backKeyPressedTime = System.currentTimeMillis()
+                Toast.makeText(this@MainActivity, "한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
+                return
+            }
+            if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+                finish();
             }
         }
+    }
 
+    private fun initViewModel() {
+        val config = Config.getInstance(this)
+        val db = AppDatabase.getInstance(this)
+        val factory = CoinViewModelFactory(db, config)
+        viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
+    }
+
+    private fun initAppUpdater() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
@@ -92,99 +100,121 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+    }
 
-
-        setSupportActionBar(binding.toolbarMain)
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
-        supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.main_frag_area, MainFragment())
-            .commit()
-
-
-        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
-            menuItem.isChecked = true
-            mDrawerLayout!!.closeDrawers()
-            when (menuItem.itemId) {
-
-                R.id.nav_rate -> {
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.addCategory(Intent.CATEGORY_DEFAULT)
-                    intent.data = Uri.parse("market://details?id=com.wonddak.coinaverage")
-                    startActivity(intent)
-                }
-
-                R.id.nav_list -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_frag_area, ListFragment())
-                        .commit()
-                }
-
-                R.id.nav_main -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_frag_area, MainFragment())
-                        .commit()
-                }
-
-                R.id.nav_graph -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_frag_area, GraphFragment())
-                        .commit()
-                }
-
-                R.id.nav_info -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_frag_area, CoinInfoFragment())
-                        .commit()
-                }
-
-                R.id.nav_mail -> {
-                    val email = Intent(Intent.ACTION_SEND)
-                    email.type = "plain/text"
-                    val address = arrayOf<String>("jmseb2@gmail.com")
-                    email.putExtra(Intent.EXTRA_EMAIL, address)
-                    email.putExtra(Intent.EXTRA_SUBJECT, "<코인 평단 계산 도우미 관련 문의입니다.>")
-                    email.putExtra(Intent.EXTRA_TEXT, "내용:")
-                    startActivity(email)
-                }
-
-                R.id.nav_setting -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.main_frag_area, SettingFragment())
-                        .commit()
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { keep }
+        this.onBackPressedDispatcher.addCallback(this, callback)
+        initViewModel()
+        initAppUpdater()
+        MobileAds.initialize(this) {}
+        val adRequest = AdRequest.Builder().build()
+//        mAdView.loadAd(adRequest)
+        lifecycleScope.launch {
+            viewModel.id.collect {
+                if (it > 0) {
+                    keep = false
                 }
             }
-            true
         }
 
-        MobileAds.initialize(this) {}
-        mAdView = binding.adView
-        val adRequest = AdRequest.Builder().build()
-        mAdView.loadAd(adRequest)
+        setContent {
+            MaterialTheme() {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MATCH2
+                ) {
+                    val scope = rememberCoroutineScope()
+                    val drawerState = rememberDrawerState(DrawerValue.Closed)
+                    val navController = rememberNavController()
+                    val snackbarHostState = remember { SnackbarHostState() }
+                    var title by remember {
+                        mutableStateOf("")
+                    }
+                    var showAddDialog by remember {
+                        mutableStateOf(false)
+                    }
+                    ModalNavigationDrawer(
+                        drawerState = drawerState,
+                        drawerContent = {
+                            DrawerView(
+                                closeDrawer = {
+                                    scope.launch {
+                                        drawerState.close()
+                                    }
+                                },
+                                navigation = {
+                                    navController.navigate(it) {
+                                        launchSingleTop = true
+                                    }
+                                })
+                        }
+                    ) {
+                        Scaffold(
+                            snackbarHost = { SnackbarHost(snackbarHostState) },
+                            topBar = {
+                                TopAppBarView(
+                                    title = title,
+                                    openDrawer = {
+                                        scope.launch {
+                                            drawerState.open()
+                                        }
+                                    }
+                                ) {
+                                    showAddDialog = true
+                                }
+                            },
+                        ) { padding ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding)
+                                    .background(MATCH2)
+                            ) {
+                                AdvertView()
+                                NavHost(
+                                    navController = navController,
+                                    startDestination = Const.Nav.Main
+                                ) {
+                                    composable(Const.Nav.Main) {
+                                        MainView(viewModel = viewModel) {
+                                            title = it
+                                        }
+                                    }
+                                    composable(Const.Nav.List) {
+                                        title = "내 코인 리스트"
+                                        CoinListView(viewModel = viewModel) {
+                                            navController.navigate(Const.Nav.Main)
+                                        }
+                                    }
+                                    composable(Const.Nav.Chart) {
+                                        title = "손절 % 계산기"
+                                        GraphView()
+                                    }
+                                    composable(Const.Nav.Setting) {
+                                        title = "설정"
+                                        SettingView(viewModel = viewModel)
+                                    }
+                                }
+                            }
+                        }
+                    }
 
-
-    }
-
-    fun hideKeyboard(editText: EditText) {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(editText.windowToken, 0)
-    }
-
-    fun showKeyboard() {
-        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
-    }
-
-    override fun onPause() {
-        super.onPause()
+                    if (showAddDialog) {
+                        NameDialog(
+                            coinInfoAndCoinDetail = null,
+                            onDismissRequest = { showAddDialog = false },
+                        ) { name ->
+                            viewModel.insertCoin(name)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -212,7 +242,7 @@ class MainActivity : AppCompatActivity() {
 
         if (requestCode == 700) {
             if (resultCode != RESULT_OK) {
-                MaterialAlertDialogBuilder(this)
+                AlertDialog.Builder(this)
                     .setPositiveButton("ok") { _, _ ->
                     }
                     .setMessage("업데이트가 취소되었습니다..")
@@ -222,50 +252,4 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.main_toolbar, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                mDrawerLayout!!.openDrawer(GravityCompat.START)
-
-            }
-
-            R.id.action_new -> {
-                Dialog(this, supportFragmentManager).newGameStart(null)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout!!.closeDrawers()
-        } else if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-            backKeyPressedTime = System.currentTimeMillis();
-            Toast.makeText(this, "한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
-            return;
-        }
-
-        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
-            finish();
-        }
-    }
-
-    fun setTitle(title: String) {
-        binding.mainTitle.text = title
-    }
-
 }
-
-
-
-
-
-

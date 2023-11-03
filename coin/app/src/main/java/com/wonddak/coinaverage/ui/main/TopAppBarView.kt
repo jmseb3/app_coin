@@ -1,5 +1,6 @@
 package com.wonddak.coinaverage.ui.main
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,12 +39,14 @@ fun TopAppBarView(
             }
         },
         actions = {
-            IconButton(onClick = addDialog) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_open_in_new_24),
-                    contentDescription = null,
-                    tint = MATCH2
-                )
+            AnimatedVisibility (title != "설정") {
+                IconButton(onClick = addDialog) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_open_in_new_24),
+                        contentDescription = null,
+                        tint = MATCH2
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.smallTopAppBarColors(

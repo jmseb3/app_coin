@@ -191,7 +191,9 @@ private fun MainContent(
                             }
                         },
                         onFocus = {
-
+                            scope.launch {
+                                listState.scrollToItem(it)
+                            }
                         }
                     )
                 }
