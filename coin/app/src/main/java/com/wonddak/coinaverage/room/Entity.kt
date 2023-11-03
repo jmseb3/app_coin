@@ -23,8 +23,6 @@ data class CoinDetail(
     val coinId: Int,
     var coinPrice: Float = 0.0f,
     var coinCount: Float = 0.0f
-
-
 )
 
 data class CoinInfoAndCoinDetail(

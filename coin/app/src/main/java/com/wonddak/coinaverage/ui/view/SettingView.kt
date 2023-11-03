@@ -64,7 +64,6 @@ private fun SectionOption(
         viewModel.setNext(!next)
     }
 
-
     var showFormatDialog by remember {
         mutableStateOf(false)
     }

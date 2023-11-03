@@ -35,11 +35,11 @@ fun FormatDialog(
         title = "표시 형식 선택"
     ) {
         title.forEachIndexed { index, format ->
-            DialogButton(onClick = { action(format.dec) }) {
-                Text(
-                    text = "소수점 $index 개",
-                    color = MATCH1
-                )
+            DialogButton(
+                text = "소수점 $index 개"
+            )
+            {
+                action(format.dec)
             }
         }
     }

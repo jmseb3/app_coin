@@ -1,5 +1,6 @@
 package com.wonddak.coinaverage.ui.dialog
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import com.wonddak.coinaverage.ui.common.CommonText
+import com.wonddak.coinaverage.ui.common.CommonTextField
 import com.wonddak.coinaverage.ui.theme.MATCH1
 
 @Composable
@@ -26,15 +28,6 @@ fun NameDialog(
     onDismissRequest: () -> Unit,
     action: (name: String) -> Unit
 ) {
-    val color = OutlinedTextFieldDefaults.colors(
-        unfocusedBorderColor = MATCH1,
-        focusedBorderColor = MATCH1,
-        disabledBorderColor = MATCH1,
-        disabledTextColor = MATCH1,
-        focusedTextColor = MATCH1,
-        unfocusedTextColor = MATCH1,
-        cursorColor = MATCH1,
-    )
     val title = if (coinInfoAndCoinDetail == null) "새 코인 추가" else "수정할 이름을 설정해주세요."
     val okText = if (coinInfoAndCoinDetail == null) "추가" else "수정"
     var name by remember {
@@ -44,7 +37,7 @@ fun NameDialog(
         onDismissRequest = onDismissRequest,
         title = title
     ) {
-        OutlinedTextField(
+        CommonTextField(
             value = name,
             onValueChange = {
                 name = it
@@ -53,28 +46,24 @@ fun NameDialog(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
             ),
-            label = {
-                Text(
-                    text = "이름",
-                    color = MATCH1
-                )
-            },
-            colors = color
+            labelText = "이름"
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Row {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             DialogButton(
-                onClick = { action(name) },
+                okText,
                 modifier = Modifier.weight(1f),
                 enabled = name.isNotEmpty()
             ) {
-                CommonText(text = okText)
+                action(name)
             }
             DialogButton(
-                onClick = { onDismissRequest() },
+                "취소",
                 modifier = Modifier.weight(1f)
             ) {
-                CommonText(text = "취소")
+                onDismissRequest()
             }
         }
     }

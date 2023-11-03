@@ -3,6 +3,7 @@ package com.wonddak.coinaverage.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wonddak.coinaverage.room.AppDatabase
+import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import com.wonddak.coinaverage.util.Config
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,7 @@ class CoinViewModel(
     val id = config.getIdData().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(),
-        initialValue = 1
+        initialValue = -1
     )
 
     val next = config.getNext().stateIn(
@@ -85,6 +86,64 @@ class CoinViewModel(
     fun deleteCoin(coinId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             db.dbDao().deleteCoinInfolById(coinId)
+        }
+    }
+
+    fun addDetail(coinId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao().insertCoinDetailData(CoinDetail(null, coinId))
+        }
+    }
+
+    fun resetCoin(coinId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao().clearCoinDetail(coinId)
+            repeat(2) {
+                db.dbDao().insertCoinDetailData(CoinDetail(null, coinId))
+            }
+        }
+    }
+
+    fun updateCoinDetailPrice(
+        coinDetailId: Int,
+        coinPrice: Float,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao()
+                .updateCoinDetailByCoinitemIdPrice(coinDetailId, coinPrice)
+        }
+    }
+
+    fun updateCoinDetailCount(
+        coinDetailId: Int,
+        coinCount: Float,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao()
+                .updateCoinDetailByCoinitemIdCount(coinDetailId, coinCount)
+        }
+    }
+
+    fun updateCoinDetail(
+        coinDetailId: Int,
+        coinPrice: Float,
+        coinCount: Float
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao()
+                .updateCoinDetailByCoinitemId(coinDetailId, coinPrice, coinCount)
+        }
+    }
+
+    fun resetCoinDetail(
+        coinDetailId: Int,
+    ) = updateCoinDetail(coinDetailId, 0.0f, 0.0f)
+
+    fun deleteCoinDetail(
+        coinDetailId: Int
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.dbDao().deleteCoinDetailById(coinDetailId)
         }
     }
 }

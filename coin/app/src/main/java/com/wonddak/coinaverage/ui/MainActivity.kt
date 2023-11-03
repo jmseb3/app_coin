@@ -3,22 +3,20 @@ package com.wonddak.coinaverage.ui
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.splashscreen.SplashScreen.KeepOnScreenCondition
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -36,9 +34,9 @@ import com.wonddak.coinaverage.ui.fragment.ListFragment
 import com.wonddak.coinaverage.ui.fragment.MainFragment
 import com.wonddak.coinaverage.ui.fragment.SettingFragment
 import com.wonddak.coinaverage.util.Config
-import com.wonddak.coinaverage.util.DataManager
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -55,17 +53,27 @@ class MainActivity : AppCompatActivity() {
 
     private val config by lazy { Config.getInstance(this@MainActivity) }
     private lateinit var viewModel: CoinViewModel
+    private var keep = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition { keep }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mDrawerLayout = binding.drawerLayout
         val db = AppDatabase.getInstance(this)
-        val factory = CoinViewModelFactory(db,config)
+        val factory = CoinViewModelFactory(db, config)
 
         viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
+
+        lifecycleScope.launch {
+            viewModel.id.collect {
+                if (it > 0) {
+                    keep = false
+                }
+            }
+        }
 
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
@@ -228,7 +236,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_new -> {
-                Dialog(this, supportFragmentManager).newGameStart( null)
+                Dialog(this, supportFragmentManager).newGameStart(null)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -250,7 +258,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setTitle(title:String) {
+    fun setTitle(title: String) {
         binding.mainTitle.text = title
     }
 

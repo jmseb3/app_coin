@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wonddak.coinaverage.databinding.FragmentComposeBinding
 import com.wonddak.coinaverage.ui.view.CoinListView
 import com.wonddak.coinaverage.ui.view.GraphView
+import com.wonddak.coinaverage.ui.view.MainView
 import com.wonddak.coinaverage.ui.view.SettingView
+import kotlinx.coroutines.launch
 
 abstract class BaseFragmentForCompose() : BaseFragment() {
     protected lateinit var binding: FragmentComposeBinding
@@ -68,6 +71,19 @@ class ListFragment : BaseFragmentForCompose() {
         }
         binding.composeView.setContent {
             CoinListView(viewModel = viewModel)
+        }
+    }
+}
+
+class MainFragment : BaseFragmentForCompose() {
+    override fun init() {
+        lifecycleScope.launch {
+            viewModel.nowInfo.collect {
+                setTitle(it?.coinInfo?.coinName ?:"코인 평단 계산기")
+            }
+        }
+        binding.composeView.setContent { 
+            MainView(viewModel = viewModel)
         }
     }
 }

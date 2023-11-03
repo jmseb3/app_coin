@@ -1,5 +1,6 @@
 package com.wonddak.coinaverage
 
+import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import java.text.DecimalFormat
 
@@ -15,8 +16,32 @@ fun CoinInfoAndCoinDetail.getAllCount(): Float {
     }
 }
 
+fun CoinInfoAndCoinDetail.getAvg(): Float {
+    return getTotalPriceSum() / getAllCount()
+}
+
 fun CoinInfoAndCoinDetail.getCoinId(): Int {
     return this.coinInfo.coinId!!
+}
+
+fun CoinDetail.getTotalPrice(): Float {
+    return this.coinPrice * this.coinCount
+}
+
+fun CoinDetail.getPriceString() :String {
+    return if (coinPrice == 0.0f) {
+        ""
+    } else {
+        coinPrice.toString()
+    }
+}
+
+fun CoinDetail.getCountString() :String {
+    return if (coinCount == 0.0f) {
+        ""
+    } else {
+        coinCount.toString()
+    }
 }
 
 

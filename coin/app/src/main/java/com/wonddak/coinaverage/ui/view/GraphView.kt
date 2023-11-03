@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.wonddak.coinaverage.ui.common.CommonTextField
 import com.wonddak.coinaverage.ui.theme.MATCH1
 import com.wonddak.coinaverage.ui.theme.MATCH2
 import com.wonddak.coinaverage.ui.theme.maple
@@ -93,8 +94,7 @@ fun GraphView() {
             unfocusedTextColor = MATCH1,
             cursorColor = MATCH1,
         )
-
-        OutlinedTextField(
+        CommonTextField(
             value = input,
             onValueChange = {
                 input = if (it.isEmpty()) {
@@ -113,39 +113,26 @@ fun GraphView() {
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            label = {
-                Text(
-                    text = title1,
-                    color = MATCH1
-                )
-            },
+            labelText = title1,
             trailingIcon = {
                 Text(
                     text = "%",
                     color = MATCH1
                 )
             },
-            colors = color
         )
-
         Spacer(modifier = Modifier.height(5.dp))
-        OutlinedTextField(
+        CommonTextField(
             value = percent,
             onValueChange = { },
             enabled = false,
-            label = {
-                Text(
-                    text = title2,
-                    color = MATCH1
-                )
-            },
+            labelText = title2,
             trailingIcon = {
                 Text(
                     text = "%",
                     color = MATCH1
                 )
             },
-            colors = color
         )
 
         LazyVerticalGrid(

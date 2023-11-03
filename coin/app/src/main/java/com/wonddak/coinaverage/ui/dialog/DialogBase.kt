@@ -56,10 +56,10 @@ fun DialogBase(
 
 @Composable
 fun DialogButton(
-    onClick: () -> Unit,
+    text :String,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit
+    onClick: () -> Unit
 ) {
     OutlinedButton(
         onClick = onClick,
@@ -68,6 +68,6 @@ fun DialogButton(
         enabled = enabled,
         shape = RoundedCornerShape(10.dp)
     ) {
-        content()
+        CommonText(text = text)
     }
 }
