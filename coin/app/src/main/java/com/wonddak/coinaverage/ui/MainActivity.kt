@@ -1,5 +1,6 @@
 package com.wonddak.coinaverage.ui
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -53,6 +57,7 @@ import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.ui.dialog.NameDialog
 import com.wonddak.coinaverage.ui.main.AdvertView
+import com.wonddak.coinaverage.ui.main.BackOnPressedExitApp
 import com.wonddak.coinaverage.ui.main.DrawerView
 import com.wonddak.coinaverage.ui.main.TopAppBarView
 import com.wonddak.coinaverage.ui.theme.MATCH2
@@ -64,28 +69,13 @@ import com.wonddak.coinaverage.util.Config
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
 import kotlinx.coroutines.launch
-
 class MainActivity : ComponentActivity() {
     private var keep = true
     private lateinit var viewModel: CoinViewModel
     private lateinit var appUpdateManager: AppUpdateManager
 
-    private var backKeyPressedTime: Long = 0
     private var adRequest: AdRequest? = null
     private var rewardedAd: RewardedAd? = null
-
-    private val callback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-                backKeyPressedTime = System.currentTimeMillis()
-                Toast.makeText(this@MainActivity, "한번 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show()
-                return
-            }
-            if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
-                finish();
-            }
-        }
-    }
 
     private fun initViewModel() {
         val config = Config.getInstance(this)
@@ -170,8 +160,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition { keep }
 
-        this.onBackPressedDispatcher.addCallback(this, callback)
-
         initViewModel()
         initAppUpdater()
         initAd()
@@ -187,8 +175,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MaterialTheme() {
+            MaterialTheme {
                 // A surface container using the 'background' color from the theme
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MATCH2
@@ -256,18 +245,21 @@ class MainActivity : ComponentActivity() {
                                     startDestination = Const.Nav.Main
                                 ) {
                                     composable(Const.Nav.Main) {
+                                        BackOnPressedExitApp()
                                         MainView(viewModel = viewModel) {
                                             title = it
                                         }
                                     }
                                     composable(Const.Nav.List) {
                                         title = "내 코인 리스트"
+                                        BackOnPressedExitApp()
                                         CoinListView(viewModel = viewModel) {
                                             navController.navigate(Const.Nav.Main)
                                         }
                                     }
                                     composable(Const.Nav.Chart) {
                                         title = "손절 % 계산기"
+                                        BackOnPressedExitApp()
                                         GraphView()
                                     }
                                     composable(Const.Nav.Setting) {

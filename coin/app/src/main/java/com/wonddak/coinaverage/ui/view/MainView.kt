@@ -1,6 +1,8 @@
 package com.wonddak.coinaverage.ui.view
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -62,6 +64,7 @@ import com.wonddak.coinaverage.toFormat
 import com.wonddak.coinaverage.ui.common.CommonText
 import com.wonddak.coinaverage.ui.common.CommonTextField
 import com.wonddak.coinaverage.ui.dialog.DialogButton
+import com.wonddak.coinaverage.ui.main.BackOnPressedExitApp
 import com.wonddak.coinaverage.ui.theme.MATCH1
 import com.wonddak.coinaverage.ui.theme.MATCH2
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
