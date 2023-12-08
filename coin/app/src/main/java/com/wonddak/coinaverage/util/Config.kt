@@ -1,15 +1,24 @@
 package com.wonddak.coinaverage.util
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class Config(context: Context) {
     companion object {
         private const val PrefName = "coindata"
 
-        private var instance :Config? = null
-        fun getInstance(context: Context) : Config {
+        private var instance: Config? = null
+        fun getInstance(context: Context): Config {
             if (instance == null) {
                 instance = Config(context)
             }
@@ -17,43 +26,85 @@ class Config(context: Context) {
         }
 
         object Key {
-            const val Next ="next"
+            const val Next = "next"
             const val Dec = "dec"
             const val IdData = "iddata"
-        }
-    }
-    val prefs: SharedPreferences = context.getSharedPreferences(PrefName, Context.MODE_PRIVATE)
 
-    fun getIdData() : Int {
-        return prefs.getInt(Key.IdData,1)
-    }
-
-    fun getDec() :String? {
-        return prefs.getString(Key.Dec, "#,###.00")
-    }
-
-    fun getNext() :Boolean {
-        return prefs.getBoolean(Key.Next,false)
-    }
-
-    fun setId(id:Int) {
-        prefs.edit {
-            putInt(Key.IdData,id)
-            commit()
+            val NextKey = booleanPreferencesKey(Next)
+            val DecKey = stringPreferencesKey(Dec)
+            val IdKey = intPreferencesKey(IdData)
+            val Reward = longPreferencesKey("reward")
         }
     }
 
-    fun setDec(dec:String) {
-        prefs.edit {
-            putString(Key.Dec,dec)
-            commit()
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+        name = PrefName,
+        produceMigrations = { context ->
+            listOf(
+                SharedPreferencesMigration(
+                    context,
+                    PrefName,
+                    setOf(Key.Next, Key.Dec, Key.IdData)
+                )
+            )
+        }
+    )
+
+    private val dataStore = context.dataStore
+
+    fun getIdData(): Flow<Int> {
+        return dataStore.data
+            .map { preferences ->
+                // No type safety.
+                preferences[Key.IdKey] ?: 1
+            }
+    }
+
+    fun getDec(): Flow<String> {
+        return dataStore.data
+            .map { preferences ->
+                // No type safety.
+                preferences[Key.DecKey] ?: "#,###.00"
+            }
+    }
+
+    fun getNext(): Flow<Boolean> {
+        return dataStore.data
+            .map { preferences ->
+                // No type safety.
+                preferences[Key.NextKey] ?: false
+            }
+    }
+
+    fun getReward(): Flow<Long> {
+        return dataStore.data
+            .map { preferences ->
+                // No type safety.
+                preferences[Key.Reward] ?: 0L
+            }
+    }
+
+    suspend fun setId(id: Int) {
+        dataStore.edit { settings ->
+            settings[Key.IdKey] = id
         }
     }
 
-    fun setNext(next:Boolean) {
-        prefs.edit {
-            putBoolean(Key.Next,next)
-            commit()
+    suspend fun setDec(dec: String) {
+        dataStore.edit { settings ->
+            settings[Key.DecKey] = dec
+        }
+    }
+
+    suspend fun setNext(next: Boolean) {
+        dataStore.edit { settings ->
+            settings[Key.NextKey] = next
+        }
+    }
+
+    suspend fun setReward(time:Long) {
+        dataStore.edit { settings ->
+            settings[Key.Reward] = time
         }
     }
 }

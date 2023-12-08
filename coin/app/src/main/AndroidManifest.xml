@@ -7,15 +7,11 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/icon"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CoinAverage">
-        <activity
-            android:name=".ui.SettingsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_settings" />
+        android:theme="@style/Theme.App.Starting">
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
@@ -24,13 +20,10 @@
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.SplashActivity"
-            android:exported="true"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait"
-            android:taskAffinity=".FLAG_ACTIVITY_NO_HISTORY">
+            android:windowSoftInputMode="adjustResize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -2,7 +2,6 @@ package com.wonddak.coinaverage.util
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.room.CoinInfo
@@ -12,7 +11,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -20,7 +18,6 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import java.io.BufferedReader
 import java.io.FileOutputStream
-import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
 
