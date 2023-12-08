@@ -218,6 +218,11 @@ class MainActivity : ComponentActivity() {
                                 navigation = {
                                     navController.navigate(it) {
                                         launchSingleTop = true
+                                        if (it != Const.Nav.Setting) {
+                                            popUpTo(navController.graph.id) {
+                                                inclusive = true
+                                            }
+                                        }
                                     }
                                 })
                         }
