@@ -30,7 +30,7 @@ fun NameDialog(
     }
     DialogBase(
         onDismissRequest = onDismissRequest,
-        title = title
+        title = title,
     ) {
         CommonTextField(
             value = name,

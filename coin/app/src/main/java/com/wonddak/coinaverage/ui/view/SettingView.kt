@@ -66,6 +66,8 @@ private fun SectionOption(
     viewModel: CoinViewModel
 ) {
     val next by viewModel.next.collectAsState()
+    val dec by viewModel.dec.collectAsState()
+
     val updateCheck = {
         viewModel.setNext(!next)
     }
@@ -106,7 +108,10 @@ private fun SectionOption(
         }
     }
     if (showFormatDialog) {
-        FormatDialog(onDismissRequest = dismiss) { format ->
+        FormatDialog(
+            nowFormat = dec,
+            onDismissRequest = dismiss
+        ) { format ->
             viewModel.setDec(format)
             dismiss()
         }

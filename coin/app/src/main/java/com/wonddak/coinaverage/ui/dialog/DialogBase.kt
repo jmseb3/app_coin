@@ -1,6 +1,7 @@
 package com.wonddak.coinaverage.ui.dialog
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +14,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.wonddak.coinaverage.ui.common.CommonText
 import com.wonddak.coinaverage.ui.theme.MATCH1
 import com.wonddak.coinaverage.ui.theme.MATCH2
@@ -27,11 +30,15 @@ fun DialogBase(
     title: String? = null,
     content: @Composable () -> Unit
 ) {
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(decorFitsSystemWindows = false)
+    ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .border(2.dp, MATCH1, RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
             color = MATCH2
         ) {
@@ -60,6 +67,7 @@ fun DialogBase(
 fun DialogButton(
     text: String,
     modifier: Modifier = Modifier,
+    fontWeight: FontWeight = FontWeight.Normal,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
@@ -70,6 +78,9 @@ fun DialogButton(
         enabled = enabled,
         shape = RoundedCornerShape(10.dp)
     ) {
-        CommonText(text = text)
+        CommonText(
+            text = text,
+            fontWeight = fontWeight
+        )
     }
 }
