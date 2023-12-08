@@ -14,6 +14,10 @@
 ![6](https://user-images.githubusercontent.com/63912638/131365538-0dfa9225-a2a0-4f31-81b1-6776f10001b3.png)
 
 # 업데이트 내역   
+[23/12/08 업데이트] 
+Compose 리팩토링 및 리뉴얼
+> 앱사이즈 8MB > 3MB
+> 실시간 시세 기능 제거
 [21/09/06 업데이트]  
 <img src = "https://user-images.githubusercontent.com/63912638/132285174-6afc41b7-ec55-4b37-8567-4d8ce1f8b51f.png" width="50%" height="50%">  
 > 화면 구성 수정
