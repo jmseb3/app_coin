@@ -58,10 +58,10 @@ fun CommonTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTextField(
+    modifier: Modifier = Modifier,
     value: TextFieldValue,
     onValueChange: (value: TextFieldValue) -> Unit,
     color: Color = MATCH1,
-    modifier: Modifier = Modifier,
     labelText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,

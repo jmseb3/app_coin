@@ -337,6 +337,17 @@ private fun MainItemRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 CommonTextField(
+                    modifier = Modifier
+                        .weight(1f)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                onFocus()
+                                val text = price.text
+                                price = price.copy(selection = TextRange(0, text.length))
+                            } else {
+                                updatePrice(price.text)
+                            }
+                        },
                     color = MATCH2,
                     value = price,
                     onValueChange = {
@@ -352,26 +363,26 @@ private fun MainItemRow(
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
-                            updatePrice(price.text)
                             focusManager.moveFocus(FocusDirection.Next)
                         },
                         onDone = {
-                            updatePrice(price.text)
                             focusManager.clearFocus()
                         }
                     ),
                     labelText = "매수가",
+                )
+                CommonTextField(
                     modifier = Modifier
                         .weight(1f)
                         .onFocusChanged { focusState ->
                             if (focusState.isFocused) {
                                 onFocus()
-                                val text = price.text
-                                price = price.copy(selection = TextRange(0, text.length))
+                                val text = count.text
+                                count = count.copy(selection = TextRange(0, text.length))
+                            } else {
+                                updateCount(count.text)
                             }
-                        }
-                )
-                CommonTextField(
+                        },
                     color = MATCH2,
                     value = count,
                     onValueChange = {
@@ -387,24 +398,13 @@ private fun MainItemRow(
                     ),
                     keyboardActions = KeyboardActions(
                         onNext = {
-                            updateCount(count.text)
                             focusManager.moveFocus(FocusDirection.Next)
                         },
                         onDone = {
-                            updateCount(price.text)
                             focusManager.clearFocus()
                         }
                     ),
                     labelText = "매수량",
-                    modifier = Modifier
-                        .weight(1f)
-                        .onFocusChanged { focusState ->
-                            if (focusState.isFocused) {
-                                onFocus()
-                                val text = count.text
-                                count = count.copy(selection = TextRange(0, text.length))
-                            }
-                        }
                 )
             }
             MainInfoRow(
