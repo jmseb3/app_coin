@@ -1,7 +1,6 @@
 package com.wonddak.coinaverage.room
 
 import androidx.room.*
-import kotlinx.serialization.Serializable
 
 @Entity
 data class CoinInfo(
@@ -24,8 +23,6 @@ data class CoinDetail(
     val coinId: Int,
     var coinPrice: Float = 0.0f,
     var coinCount: Float = 0.0f
-
-
 )
 
 data class CoinInfoAndCoinDetail(
@@ -37,5 +34,4 @@ data class CoinInfoAndCoinDetail(
     )
 
     val coinDetailList: List<CoinDetail>
-
 )
