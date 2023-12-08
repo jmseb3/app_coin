@@ -1,8 +1,10 @@
 package com.wonddak.coinaverage.ui.view
 
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +55,7 @@ import com.wonddak.coinaverage.getCountString
 import com.wonddak.coinaverage.getPriceString
 import com.wonddak.coinaverage.getTotalPrice
 import com.wonddak.coinaverage.getTotalPriceSum
+import com.wonddak.coinaverage.noRippleClickable
 import com.wonddak.coinaverage.room.CoinDetail
 import com.wonddak.coinaverage.room.CoinInfoAndCoinDetail
 import com.wonddak.coinaverage.toFormat
@@ -225,12 +228,12 @@ private fun MainContent(
 
 @Composable
 private fun MainInfoRow(
+    modifier: Modifier = Modifier,
     section: String,
     info: String,
-    modifier: Modifier = Modifier,
     color: Color = MATCH1
 ) {
-    Row(modifier = modifier.fillMaxWidth()) {
+    Row(modifier = modifier) {
         CommonText(
             text = section,
             modifier = Modifier.weight(1f),
@@ -246,6 +249,7 @@ private fun MainInfoRow(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MainItemRow(
     item: CoinDetail,
@@ -285,6 +289,14 @@ private fun MainItemRow(
         }
     }
     Card(
+        modifier = Modifier.combinedClickable(
+            onClick = {
+
+            },
+            onLongClick = {
+                actionDelete()
+            }
+        ),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MATCH1
@@ -294,48 +306,13 @@ private fun MainItemRow(
             modifier = Modifier.padding(10.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 CommonText(
                     text = "# $position",
-                    color = MATCH2
+                    color = MATCH2,
                 )
-                Row {
-                    IconButton(
-                        onClick = {
-                            actionReset()
-                            price = TextFieldValue("")
-                            count = TextFieldValue("")
-                            focusManager.clearFocus()
-                        },
-                        modifier = Modifier.size(20.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_restore_24),
-                            contentDescription = null,
-                            Modifier.size(15.dp),
-                            tint = MATCH2
-                        )
-                    }
-                    IconButton(
-                        onClick = actionDelete,
-                        modifier = Modifier.size(20.dp)
-
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_delete_24),
-                            contentDescription = null,
-                            Modifier.size(15.dp),
-                            tint = MATCH2
-                        )
-                    }
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
                 CommonTextField(
                     modifier = Modifier
                         .weight(1f)
@@ -407,12 +384,35 @@ private fun MainItemRow(
                     labelText = "매수량",
                 )
             }
-            MainInfoRow(
-                section = "총 가격",
-                info = item.getTotalPrice().toFormat(dec, "원"),
-                modifier = Modifier.padding(10.dp),
-                color = MATCH2
-            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                IconButton(
+                    modifier = Modifier.size(23.dp),
+                    onClick = {
+                        actionReset()
+                        price = TextFieldValue("")
+                        count = TextFieldValue("")
+                        focusManager.clearFocus()
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_restore_24),
+                        contentDescription = null,
+                        Modifier.size(18.dp),
+                        tint = MATCH2
+                    )
+                }
+                MainInfoRow(
+                    modifier = Modifier.padding(10.dp),
+                    section = "총 가격",
+                    info = item.getTotalPrice().toFormat(dec, "원"),
+                    color = MATCH2
+                )
+            }
         }
     }
 }

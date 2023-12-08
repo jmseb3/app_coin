@@ -54,8 +54,7 @@ fun Float.toFormat(
     dec: String,
     prefix: String = ""
 ): String {
-    val dec = DecimalFormat(dec)
-    return dec.format(this) + prefix
+    return DecimalFormat(dec).format(this) + prefix
 }
 
 fun Float.toFormat(
