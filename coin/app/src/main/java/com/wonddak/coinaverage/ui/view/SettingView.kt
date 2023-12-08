@@ -123,18 +123,21 @@ private fun SectionData() {
     val context = LocalContext.current
     val dataManager = DataManager.getInstance(context)
 
+    val showToast  = {msg:String ->
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+    }
+
     val exportLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val fileUri = result.data?.data
             if (fileUri == null) {
-                Toast.makeText(context, "에러 발생! 올바른 위치를 지정해주세요.", Toast.LENGTH_SHORT)
-                    .show()
+                showToast("에러 발생! 올바른 위치를 지정해주세요.")
             } else {
                 dataManager.export(
                     fileUri,
-                    { Toast.makeText(context, "저장에 실패하엿습니다.", Toast.LENGTH_SHORT).show() }
+                    { showToast("저장에 실패하엿습니다.")}
                 ) {
-                    Toast.makeText(context, "성공적으로 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                    showToast("성공적으로 저장되었습니다.")
                 }
             }
         }
@@ -142,13 +145,13 @@ private fun SectionData() {
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val fileUri = result.data?.data
             if (fileUri == null) {
-                Toast.makeText(context, "에러 발생! 파일을 불러오는데 실패했습니다..", Toast.LENGTH_SHORT).show()
+                showToast("에러 발생! 파일을 불러오는데 실패했습니다..",)
             } else {
                 dataManager.import(
                     fileUri,
-                    { Toast.makeText(context, "데이터를 불러오는데 실패했습니다.", Toast.LENGTH_SHORT).show() }
+                    { showToast("데이터를 불러오는데 실패했습니다.") }
                 ) {
-                    Toast.makeText(context, "성공적으로 불러왔습니다.", Toast.LENGTH_SHORT).show()
+                    showToast("성공적으로 불러왔습니다.")
                 }
             }
         }
