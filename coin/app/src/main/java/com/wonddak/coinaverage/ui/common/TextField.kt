@@ -32,7 +32,8 @@ fun CommonTextField(
         disabledBorderColor = color,
         disabledTextColor = color,
         cursorColor = color,
-        focusedTextColor = color
+        focusedTextColor = color,
+        unfocusedTextColor = color
     )
     OutlinedTextField(
         modifier = modifier,
