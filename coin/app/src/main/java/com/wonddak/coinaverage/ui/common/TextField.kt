@@ -15,10 +15,10 @@ import com.wonddak.coinaverage.ui.theme.MATCH1
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (value: String) -> Unit,
     color: Color = MATCH1,
-    modifier: Modifier = Modifier,
     labelText: String? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -32,7 +32,7 @@ fun CommonTextField(
         disabledBorderColor = color,
         disabledTextColor = color,
         cursorColor = color,
-        textColor = color
+        focusedTextColor = color
     )
     OutlinedTextField(
         modifier = modifier,
