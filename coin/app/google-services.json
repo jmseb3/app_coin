@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1077223813297",
+    "project_id": "coin-beb0e",
+    "storage_bucket": "coin-beb0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1077223813297:android:86a0024fd484f9646a3290",
+        "android_client_info": {
+          "package_name": "com.wonddak.coinaverage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyt_2BmYf73BOeT2gGKgHHIHC0JqqRzfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

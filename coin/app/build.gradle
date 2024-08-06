@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
 apply from: "../keystore/signing.gradle"
@@ -16,7 +17,7 @@ android {
         applicationId "com.wonddak.coinaverage"
         minSdkVersion 24
         targetSdk 34
-        versionCode 20
+        versionCode 21
         versionName "5.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -77,4 +78,8 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 }
