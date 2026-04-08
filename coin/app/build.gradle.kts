@@ -21,8 +21,8 @@ android {
         applicationId = "com.wonddak.coinaverage"
         minSdk = 24
         targetSdk = 36
-        versionCode = 21
-        versionName = "5.0.1"
+        versionCode = 30
+        versionName = "5.2.0"
 
         testInstrumentationRunner ="androidx.test.runner.AndroidJUnitRunner"
     }
