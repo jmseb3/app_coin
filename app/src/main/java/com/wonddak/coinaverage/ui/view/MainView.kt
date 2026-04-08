@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -123,17 +124,21 @@ private fun MainContent(
     actionItemUpdateCount: (detailId: Int, count: Float) -> Unit,
 ) {
     val context = LocalContext.current
-    val buttonHeight = ButtonDefaults.MinHeight + 5.dp
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MATCH2)
-            .padding(10.dp),
+            .padding(10.dp)
+            .imePadding(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Column {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+        ) {
             Column(
                 modifier = Modifier
                     .border(
@@ -202,15 +207,12 @@ private fun MainContent(
                         }
                     )
                 }
-                item { Spacer(modifier = Modifier.height(buttonHeight)) }
             }
         }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MATCH2)
-                .align(Alignment.BottomCenter)
-                .height(buttonHeight),
+                .background(MATCH2),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             DialogButton(
