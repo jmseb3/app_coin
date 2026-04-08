@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.noRippleClickable
 import com.wonddak.coinaverage.ui.dialog.FormatDialog
@@ -252,7 +254,7 @@ fun SectionRow(
             .noRippleClickable {
                 action()
             }
-            .height(70.dp)
+            .heightIn(min = 80.dp)
             .padding(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -266,7 +268,7 @@ fun SectionRow(
             Text(
                 text = text,
                 color = MATCH2,
-                fontSize = TextUnit(14f, TextUnitType.Sp),
+                fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 fontFamily = maple
@@ -275,7 +277,7 @@ fun SectionRow(
                 Text(
                     text = description,
                     color = MATCH2,
-                    fontSize = TextUnit(11f, TextUnitType.Sp),
+                    fontSize = 11.sp,
                     maxLines = 2,
                     fontFamily = maple
                 )

@@ -58,7 +58,10 @@ fun CoinListView(
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize().background(MATCH2)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MATCH2)
+            .padding(10.dp)
     ) {
         CommonText(
             text = "길게 눌러서 이름 수정이 가능합니다.",
