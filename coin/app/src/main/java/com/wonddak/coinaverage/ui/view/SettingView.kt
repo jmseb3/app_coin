@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -86,7 +87,7 @@ private fun SectionOption(
         ) {
             showFormatDialog = true
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
         SectionRow(
             painter = painterResource(id = R.drawable.baseline_filter_center_focus_24),
             text = "입력 후 다음 항목으로 이동",
@@ -170,7 +171,7 @@ private fun SectionData() {
                 exportLauncher.launch(intent)
             }
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
         SectionRow(
             painter = painterResource(id = R.drawable.baseline_cloud_download_24),
             text = "불러오기",
@@ -227,14 +228,12 @@ private fun SectionView(
             color = MATCH1,
             fontFamily = maple
         )
-        Divider(color = MATCH1)
-        Column(
-
-        ) {
+        HorizontalDivider(color = MATCH1)
+        Column() {
             content()
 
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
     }
 }
 

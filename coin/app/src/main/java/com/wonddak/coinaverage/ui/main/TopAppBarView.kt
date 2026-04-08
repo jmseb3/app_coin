@@ -47,7 +47,7 @@ fun TopAppBarView(
                 }
             }
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MATCH1
         )
     )
