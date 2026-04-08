@@ -1,0 +1,69 @@
+import java.util.Properties
+
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { stream ->
+        localProperties.load(stream)
+    }
+}
+
+def resolveSecret = { String name ->
+    def localValue = localProperties.getProperty(name)?.trim()
+    if (localValue) {
+        return localValue
+    }
+
+    def envValue = System.getenv(name)?.trim()
+    if (envValue) {
+        return envValue
+    }
+    return null
+}
+
+def signingAliases = [
+        mtManagerSigning: "mtmanager",
+        LoaCellSigning  : "loaCell",
+        boardgameSigning: "boardgame",
+        coinSigning     : "coin",
+        mathSigning     : "math",
+        boasSigning     : "boas",
+        allMaGoSigning  : "allmago",
+]
+
+def configuredKeystorePath = resolveSecret("KEYSTORE_FILE")
+def keystoreFile = configuredKeystorePath ? new File(configuredKeystorePath) : rootProject.file("keystore/myappkey.jks")
+if (configuredKeystorePath && !keystoreFile.isAbsolute()) {
+    keystoreFile = rootProject.file(configuredKeystorePath)
+}
+def storePasswordValue = resolveSecret("STORE_PASSWORD")
+def keyPasswordValue = resolveSecret("KEY_PASSWORD") ?: storePasswordValue
+
+if (!storePasswordValue) {
+    logger.lifecycle(
+            "Signing configs not loaded. Set STORE_PASSWORD " +
+                    "and optionally KEY_PASSWORD in local.properties."
+    )
+    return
+}
+
+if (!keystoreFile.exists()) {
+    logger.lifecycle(
+            "Signing configs not loaded. Keystore file not found at ${keystoreFile}. " +
+                    "Set KEYSTORE_FILE in local.properties to override the default path."
+    )
+    return
+}
+
+android {
+    signingConfigs {
+        signingAliases.each { configName, aliasName ->
+            maybeCreate(configName).with {
+                storeFile = keystoreFile
+                storePassword = storePasswordValue
+                keyAlias = aliasName
+                keyPassword = keyPasswordValue
+            }
+        }
+    }
+}
