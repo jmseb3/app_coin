@@ -1,58 +1,74 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
 }
 
-apply from: "../keystore/signing.gradle"
+apply("../keystore/signing.gradle")
 
 android {
-    compileSdk 34
+    compileSdk = 36
     namespace = "com.wonddak.coinaverage"
 
     defaultConfig {
-        applicationId "com.wonddak.coinaverage"
-        minSdkVersion 24
-        targetSdk 34
-        versionCode 21
-        versionName "5.0.1"
+        applicationId = "com.wonddak.coinaverage"
+        minSdk = 24
+        targetSdk = 36
+        versionCode = 21
+        versionName = "5.0.1"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildFeatures {
-        compose = true
+        testInstrumentationRunner ="androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled = false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.coinSigning
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            signingConfig = signingConfigs.getByName("coinSigning")
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("11")
     }
 }
 
 dependencies {
     implementation(libs.play.services.ads)
 
-    implementation("com.google.android.play:app-update:2.1.0")
-    implementation("com.google.android.play:app-update-ktx:2.1.0")
-
+    //Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
     testImplementation(libs.room.testing)
+
+    //Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+
+    //InApp Update
+    implementation(libs.app.update)
+    implementation(libs.app.update.ktx)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
@@ -80,7 +96,5 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics")
+
 }

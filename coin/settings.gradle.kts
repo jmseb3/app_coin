@@ -1,3 +1,6 @@
+rootProject.name = "CoinAverage"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -14,4 +17,3 @@ dependencyResolutionManagement {
     }
 }
 include(":app")
-rootProject.name = "CoinAverage"
