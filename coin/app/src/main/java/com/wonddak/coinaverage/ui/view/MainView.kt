@@ -285,7 +285,17 @@ private fun MainItemRow(
         } else {
             val regex = Regex("\\d+?\\.?\\d*")
             if (regex.matches(value.text)) {
-                value
+                val split = value.text.split(".", limit = 2)
+                val number = split[0].trimStart('0').ifEmpty { "0" }
+                val text = if (split.size == 2) {
+                    "$number.${split[1]}"
+                } else {
+                    number
+                }
+                value.copy(
+                    text = text,
+                    selection = TextRange(text.length)
+                )
             } else {
                 null
             }

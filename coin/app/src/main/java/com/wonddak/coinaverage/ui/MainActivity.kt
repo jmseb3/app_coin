@@ -1,29 +1,25 @@
 package com.wonddak.coinaverage.ui
 
-import android.app.Activity
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -40,20 +36,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.wonddak.coinaverage.Const
-import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.room.AppDatabase
 import com.wonddak.coinaverage.ui.dialog.NameDialog
 import com.wonddak.coinaverage.ui.main.AdvertView
@@ -65,17 +55,19 @@ import com.wonddak.coinaverage.ui.view.CoinListView
 import com.wonddak.coinaverage.ui.view.GraphView
 import com.wonddak.coinaverage.ui.view.MainView
 import com.wonddak.coinaverage.ui.view.SettingView
+import com.wonddak.coinaverage.util.AdManager
 import com.wonddak.coinaverage.util.Config
 import com.wonddak.coinaverage.viewmodel.CoinViewModel
 import com.wonddak.coinaverage.viewmodel.CoinViewModelFactory
 import kotlinx.coroutines.launch
+
 class MainActivity : ComponentActivity() {
+
     private var keep = true
     private lateinit var viewModel: CoinViewModel
     private lateinit var appUpdateManager: AppUpdateManager
+    private val adManager by lazy { AdManager(this) }
 
-    private var adRequest: AdRequest? = null
-    private var rewardedAd: RewardedAd? = null
 
     private fun initViewModel() {
         val config = Config.getInstance(this)
@@ -84,10 +76,37 @@ class MainActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this, factory)[CoinViewModel::class.java]
     }
 
+    private val updateLauncher =
+        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode != RESULT_OK) {
+                AlertDialog.Builder(this)
+                    .setPositiveButton("ok") { _, _ ->
+                    }
+                    .setMessage("업데이트가 취소되었습니다..")
+                    .show()
+            }
+        }
+
     private fun initAppUpdater() {
         appUpdateManager = AppUpdateManagerFactory.create(this)
 
         val appUpdateInfoTask = appUpdateManager.appUpdateInfo
+
+        val listener = InstallStateUpdatedListener { state ->
+            // (Optional) Provide a download progress bar.
+            if (state.installStatus() == InstallStatus.DOWNLOADING) {
+                val bytesDownloaded = state.bytesDownloaded()
+                val totalBytesToDownload = state.totalBytesToDownload()
+                // Show update progress bar.
+            } else if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                // After the update is downloaded, show a notification
+                // and request user confirmation to restart the app.
+                popupSnackbarForCompleteUpdate()
+
+            }
+            // Log state or install the update.
+        }
+        appUpdateManager.registerListener(listener)
 
         appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
             if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
@@ -95,74 +114,24 @@ class MainActivity : ComponentActivity() {
             ) {
                 appUpdateManager.startUpdateFlowForResult(
                     appUpdateInfo,
-                    AppUpdateType.FLEXIBLE,
-                    this,
-                    700
+                    updateLauncher,
+                    AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE)
+                        .setAllowAssetPackDeletion(true)
+                        .build()
                 )
             }
-
         }
     }
 
-    private fun initAd() {
-        val TAG = "JWH"
-        adRequest = AdRequest.Builder().build()
-        MobileAds.initialize(this) {}
-        RewardedAd.load(
-            this,
-            getString(R.string.reward_ad_unit_id),
-            adRequest!!,
-            object : RewardedAdLoadCallback() {
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    Log.d("JWH", adError?.toString().toString())
-                    rewardedAd = null
-                }
 
-                override fun onAdLoaded(ad: RewardedAd) {
-                    Log.d("JWH", "Ad was loaded.")
-                    rewardedAd = ad
-                    rewardedAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-                        override fun onAdClicked() {
-                            // Called when a click is recorded for an ad.
-                            Log.d(TAG, "Ad was clicked.")
-                        }
-
-                        override fun onAdDismissedFullScreenContent() {
-                            // Called when ad is dismissed.
-                            // Set the ad reference to null so you don't show the ad a second time.
-                            Log.d(TAG, "Ad dismissed fullscreen content.")
-                            rewardedAd = null
-                        }
-
-                        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                            // Called when ad fails to show.
-                            Log.e(TAG, "Ad failed to show fullscreen content.")
-                            rewardedAd = null
-                        }
-
-                        override fun onAdImpression() {
-                            // Called when an impression is recorded for an ad.
-                            Log.d(TAG, "Ad recorded an impression.")
-                        }
-
-                        override fun onAdShowedFullScreenContent() {
-                            // Called when ad is shown.
-                            Log.d(TAG, "Ad showed fullscreen content.")
-                        }
-                    }
-
-                }
-            })
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition { keep }
+        WindowCompat.enableEdgeToEdge(window)
 
         initViewModel()
         initAppUpdater()
-        initAd()
+        adManager.initAd()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -188,6 +157,24 @@ class MainActivity : ComponentActivity() {
                     val snackbarHostState = remember { SnackbarHostState() }
 
 
+                    LaunchedEffect(viewModel.showUpdateNeed) {
+                        if (viewModel.showUpdateNeed) {
+                            val result = snackbarHostState.showSnackbar(
+                                "An update has just been downloaded.",
+                                "RESTART",
+                                false,
+                                SnackbarDuration.Indefinite
+                            )
+                            when(result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    appUpdateManager.completeUpdate()
+                                }
+                                SnackbarResult.Dismissed -> {
+
+                                }
+                            }
+                        }
+                    }
                     var title by remember {
                         mutableStateOf("")
                     }
@@ -266,7 +253,11 @@ class MainActivity : ComponentActivity() {
                                         title = "설정"
                                         SettingView(
                                             viewModel = viewModel
-                                        ) { showRewardAd() }
+                                        ) {
+                                            adManager.showRewardAd {
+                                                viewModel.setReward(System.currentTimeMillis())
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -292,50 +283,25 @@ class MainActivity : ComponentActivity() {
         appUpdateManager
             .appUpdateInfo
             .addOnSuccessListener { appUpdateInfo ->
-                if (appUpdateInfo.updateAvailability() ==
-                    UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
+                if (appUpdateInfo.updateAvailability()
+                    == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
                 ) {
+                    // If an in-app update is already running, resume the update.
                     appUpdateManager.startUpdateFlowForResult(
                         appUpdateInfo,
-                        AppUpdateType.FLEXIBLE,
-                        this,
-                        700
+                        updateLauncher,
+                        AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE)
+                            .setAllowAssetPackDeletion(true)
+                            .build()
                     )
-
+                }else if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
+                    popupSnackbarForCompleteUpdate()
                 }
             }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 700) {
-            if (resultCode != RESULT_OK) {
-                AlertDialog.Builder(this)
-                    .setPositiveButton("ok") { _, _ ->
-                    }
-                    .setMessage("업데이트가 취소되었습니다..")
-                    .show()
-            } else {
-
-            }
-        }
+    private fun popupSnackbarForCompleteUpdate() {
+        viewModel.showUpdateNeed = true
     }
 
-    private fun showRewardAd() {
-        rewardedAd?.let { ad ->
-            ad.show(
-                this@MainActivity
-            ) { rewardItem ->
-                // Handle the reward.
-                val rewardAmount = rewardItem.amount
-                val rewardType = rewardItem.type
-                Log.d("JWH", "User earned the reward.")
-                viewModel.setReward(System.currentTimeMillis())
-            }
-        } ?: run {
-            Log.d("JWH", "The rewarded ad wasn't ready yet.")
-            Toast.makeText(this,"현재 준비된 광고가 없습니다.",Toast.LENGTH_SHORT).show()
-        }
-    }
 }

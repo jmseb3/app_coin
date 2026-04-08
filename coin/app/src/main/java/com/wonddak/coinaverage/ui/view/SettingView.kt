@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.wonddak.coinaverage.R
 import com.wonddak.coinaverage.noRippleClickable
 import com.wonddak.coinaverage.ui.dialog.FormatDialog
@@ -86,7 +89,7 @@ private fun SectionOption(
         ) {
             showFormatDialog = true
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
         SectionRow(
             painter = painterResource(id = R.drawable.baseline_filter_center_focus_24),
             text = "입력 후 다음 항목으로 이동",
@@ -170,7 +173,7 @@ private fun SectionData() {
                 exportLauncher.launch(intent)
             }
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
         SectionRow(
             painter = painterResource(id = R.drawable.baseline_cloud_download_24),
             text = "불러오기",
@@ -227,14 +230,12 @@ private fun SectionView(
             color = MATCH1,
             fontFamily = maple
         )
-        Divider(color = MATCH1)
-        Column(
-
-        ) {
+        HorizontalDivider(color = MATCH1)
+        Column() {
             content()
 
         }
-        Divider(color = MATCH1)
+        HorizontalDivider(color = MATCH1)
     }
 }
 
@@ -253,7 +254,7 @@ fun SectionRow(
             .noRippleClickable {
                 action()
             }
-            .height(70.dp)
+            .heightIn(min = 80.dp)
             .padding(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -267,7 +268,7 @@ fun SectionRow(
             Text(
                 text = text,
                 color = MATCH2,
-                fontSize = TextUnit(14f, TextUnitType.Sp),
+                fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 fontFamily = maple
@@ -276,7 +277,7 @@ fun SectionRow(
                 Text(
                     text = description,
                     color = MATCH2,
-                    fontSize = TextUnit(11f, TextUnitType.Sp),
+                    fontSize = 11.sp,
                     maxLines = 2,
                     fontFamily = maple
                 )

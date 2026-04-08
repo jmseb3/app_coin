@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +44,7 @@ fun DrawerView(
             .fillMaxWidth(0.7f)
             .fillMaxHeight()
             .background(Color.White)
+            .systemBarsPadding()
             .padding(10.dp)
     ) {
         BackHandler {
@@ -52,7 +55,7 @@ fun DrawerView(
             color = MATCH2,
             modifier = Modifier.padding(10.dp)
         )
-        Divider()
+        HorizontalDivider()
         NavigationDrawerItem(
             label = "메인",
             res = R.drawable.ic_baseline_home_24
@@ -74,7 +77,7 @@ fun DrawerView(
             navigation(Const.Nav.Chart)
             closeDrawer()
         }
-        Divider()
+        HorizontalDivider()
         NavigationDrawerItem(
             label = "설정",
             res = R.drawable.ic_baseline_settings_24
@@ -82,7 +85,7 @@ fun DrawerView(
             navigation(Const.Nav.Setting)
             closeDrawer()
         }
-        Divider()
+        HorizontalDivider()
         NavigationDrawerItem(
             label = "문의하기",
             res = R.drawable.ic_baseline_email_24

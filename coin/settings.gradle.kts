@@ -1,18 +1,19 @@
+rootProject.name = "CoinAverage"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
         google()
-        jcenter()
         mavenCentral()
+
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
 }
-include ':app'
-rootProject.name = "CoinAverage"
+include(":app")
