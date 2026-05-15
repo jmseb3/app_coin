@@ -424,7 +424,7 @@ private fun MainItemRow(
                 MainInfoRow(
                     modifier = Modifier.padding(10.dp),
                     section = "총 가격",
-                    info = item.getTotalPrice().toFormat(dec, "원"),
+                    info = item.getTotalPrice().takeIf { it > 0.0f }?.toFormat(dec, "원") ?: "매수가/매수량을 입력해 주세요.",
                     color = MATCH2
                 )
             }
