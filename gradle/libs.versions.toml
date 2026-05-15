@@ -1,6 +1,6 @@
 [versions]
 activityCompose = "1.13.0"
-agp = "9.0.0"
+agp = "9.2.1"
 appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
 coreSplashscreen = "1.2.0"
