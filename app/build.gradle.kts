@@ -71,6 +71,8 @@ dependencies {
 
 
     implementation(libs.play.services.ads)
+    implementation("com.unity3d.ads:unity-ads:4.16.5")
+    implementation("com.google.ads.mediation:unity:4.17.0.0")
 
     //Room
     implementation(libs.room.runtime)
