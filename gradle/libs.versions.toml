@@ -5,19 +5,19 @@ appUpdate = "2.1.0"
 appUpdateKtx = "2.1.0"
 coreSplashscreen = "1.2.0"
 datastorePreferences = "1.2.1"
-firebaseBom = "34.11.0"
-kotlin = "2.3.20"
-ksp = "2.3.5"
-kotlinxSerializationJson = "1.10.0"
+firebaseBom = "34.13.0"
+kotlin = "2.3.21"
+ksp = "2.3.7"
+kotlinxSerializationJson = "1.11.0"
 lifecycleRuntime = "2.10.0"
-navigationCompose = "2.9.7"
-playServicesAds = "25.1.0"
+navigationCompose = "2.9.8"
+playServicesAds = "25.2.0"
 room = "2.8.4"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityCompose" }
-androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2026.03.01" }
+androidx-compose-bom = { module = "androidx.compose:compose-bom", version = "2026.05.00" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntime" }
